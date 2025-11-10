@@ -6,6 +6,7 @@ const state = {
     activeView: 'overview',
     activity: [],
     crateAnimation: null
+    activity: []
 };
 
 const app = document.getElementById('app');
@@ -417,6 +418,13 @@ window.addEventListener('message', (event) => {
                         state.selectedItem = null;
                     }, 1200);
                 }
+                modalFeedback.style.color = '#7dffb3';
+                modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
+                addActivityEntry(`✅ ${state.selectedItem.label}`, true);
+                setTimeout(() => {
+                    modalFeedback.textContent = '';
+                    closeModal();
+                }, 1200);
             } else {
                 modalFeedback.style.color = '#ff416c';
                 const messages = {
