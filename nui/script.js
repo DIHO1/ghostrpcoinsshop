@@ -4,6 +4,8 @@ const state = {
     selectedItem: null,
     wallet: 0,
     activeView: 'overview',
+    activity: [],
+    crateAnimation: null
     activity: []
 };
 
@@ -21,6 +23,16 @@ const navGlow = document.getElementById('navGlow');
 const navButtons = nav ? nav.querySelectorAll('.nav-item') : [];
 const viewPanels = document.querySelectorAll('.view-panel');
 const activityLog = document.getElementById('activityLog');
+const crateOverlay = document.getElementById('crateOverlay');
+const crateTitle = document.getElementById('crateTitle');
+const crateTrack = document.getElementById('crateTrack');
+const crateReel = document.getElementById('crateReel');
+const crateSummary = document.getElementById('crateSummary');
+const crateRewardIcon = document.getElementById('crateRewardIcon');
+const crateRewardLabel = document.getElementById('crateRewardLabel');
+const crateRewardRarity = document.getElementById('crateRewardRarity');
+const crateContinue = document.getElementById('crateContinue');
+const crateClose = document.getElementById('crateClose');
 
 function formatPrice(amount) {
     return `${state.currency.symbol} ${amount}`;
@@ -132,6 +144,163 @@ function addActivityEntry(label, success) {
     }
 }
 
+function resetCrateOverlay() {
+    if (!crateOverlay) {
+        return;
+    }
+
+    if (state.crateAnimation) {
+        state.crateAnimation.cancel();
+        state.crateAnimation = null;
+    }
+
+    crateOverlay.classList.add('hidden');
+    crateSummary.classList.remove('visible');
+    crateSummary.style.boxShadow = '';
+    crateSummary.style.borderColor = '';
+    crateRewardRarity.style.color = '';
+    crateTrack.innerHTML = '';
+}
+
+function closeCrateOverlay() {
+    const rewardLabel = crateRewardLabel ? crateRewardLabel.textContent : '';
+    const summaryWasVisible = crateSummary && crateSummary.classList.contains('visible');
+    resetCrateOverlay();
+    setActiveView('shop');
+    if (!summaryWasVisible && rewardLabel) {
+        addActivityEntry(`🎉 ${rewardLabel}`, true);
+    }
+}
+
+function buildCrateCards(pool, selection) {
+    const sanitizedPool = Array.isArray(pool) && pool.length > 0
+        ? pool.map((entry) => ({
+            id: entry.id,
+            label: entry.label || 'Nagroda',
+            icon: entry.icon || '🎁',
+            rarity: (entry.rarity || 'pospolity').toLowerCase()
+        }))
+        : [];
+
+    const basePool = sanitizedPool.length > 0 ? sanitizedPool : [
+        {
+            id: selection.id,
+            label: selection.label || 'Nagroda',
+            icon: selection.icon || '🎁',
+            rarity: (selection.rarity || 'pospolity').toLowerCase()
+        }
+    ];
+
+    const randomFromPool = () => {
+        const entry = basePool[Math.floor(Math.random() * basePool.length)];
+        return { ...entry };
+    };
+
+    const cards = [];
+    for (let i = 0; i < 6; i += 1) {
+        cards.push(randomFromPool());
+    }
+
+    cards.push({
+        id: selection.id,
+        label: selection.label || 'Nagroda',
+        icon: selection.icon || '🎁',
+        rarity: (selection.rarity || 'pospolity').toLowerCase(),
+        winning: true
+    });
+
+    for (let i = 0; i < 6; i += 1) {
+        cards.push(randomFromPool());
+    }
+
+    return cards;
+}
+
+function playCrateAnimation(item, context) {
+    if (!crateOverlay || !context || context.type !== 'crate') {
+        return;
+    }
+
+    crateOverlay.classList.remove('hidden');
+    crateTitle.textContent = context.crateLabel || item.label || 'Skrzynia';
+    crateSummary.classList.remove('visible');
+
+    const highlight = context.highlight || '#62f6ff';
+    crateSummary.style.borderColor = highlight;
+    crateSummary.style.boxShadow = `0 0 32px ${highlight}55`;
+    crateRewardRarity.style.color = highlight;
+
+    const selection = context.selection || {};
+    crateRewardIcon.textContent = selection.icon || item.icon || '🎁';
+    crateRewardLabel.textContent = selection.label || 'Nagroda';
+    crateRewardRarity.textContent = (selection.rarity || 'tajemnicza');
+
+    crateTrack.innerHTML = '';
+
+    const cards = buildCrateCards(context.poolPreview, selection);
+
+    cards.forEach((card) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'crate-card';
+        cardElement.dataset.rarity = card.rarity;
+
+        const icon = document.createElement('span');
+        icon.className = 'icon';
+        icon.textContent = card.icon || '🎁';
+
+        const label = document.createElement('span');
+        label.className = 'label';
+        label.textContent = card.label;
+
+        cardElement.appendChild(icon);
+        cardElement.appendChild(label);
+        if (card.winning) {
+            cardElement.dataset.winning = 'true';
+        }
+
+        crateTrack.appendChild(cardElement);
+    });
+
+    requestAnimationFrame(() => {
+        const winningElement = crateTrack.querySelector('[data-winning="true"]');
+        const cardElement = crateTrack.querySelector('.crate-card');
+        if (!winningElement || !cardElement) {
+            crateSummary.classList.add('visible');
+            addActivityEntry(`🎉 ${selection.label || item.label}`, true);
+            return;
+        }
+
+        const cardRect = cardElement.getBoundingClientRect();
+        const trackStyles = window.getComputedStyle(crateTrack);
+        const gapValue = parseFloat(trackStyles.columnGap || trackStyles.gap || '0') || 0;
+        const cardWidth = cardRect.width;
+        const cardsBefore = Array.from(crateTrack.children).indexOf(winningElement);
+        const totalWidth = cardsBefore * (cardWidth + gapValue);
+        const reelWidth = crateReel.getBoundingClientRect().width;
+        const targetOffset = Math.max(0, totalWidth - (reelWidth / 2 - cardWidth / 2));
+
+        if (state.crateAnimation) {
+            state.crateAnimation.cancel();
+        }
+
+        state.crateAnimation = crateTrack.animate([
+            { transform: 'translateX(0)' },
+            { transform: `translateX(-${targetOffset}px)` }
+        ], {
+            duration: 4600,
+            easing: 'cubic-bezier(0.12, 0.01, 0, 1)',
+            fill: 'forwards'
+        });
+
+        state.crateAnimation.onfinish = () => {
+            winningElement.classList.add('winning');
+            crateSummary.classList.add('visible');
+            addActivityEntry(`🎉 ${selection.label || item.label}`, true);
+            state.crateAnimation = null;
+        };
+    });
+}
+
 navButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const view = button.dataset.view;
@@ -183,6 +352,18 @@ cancelPurchase.addEventListener('click', () => {
     closeModal();
 });
 
+if (crateContinue) {
+    crateContinue.addEventListener('click', () => {
+        closeCrateOverlay();
+    });
+}
+
+if (crateClose) {
+    crateClose.addEventListener('click', () => {
+        closeCrateOverlay();
+    });
+}
+
 window.addEventListener('message', (event) => {
     const data = event.data;
     if (!data || !data.action) {
@@ -201,6 +382,7 @@ window.addEventListener('message', (event) => {
         case 'close':
             app.classList.add('hidden');
             closeModal();
+            resetCrateOverlay();
             document.body.classList.remove('market-active');
             setActiveView('overview');
             break;
@@ -221,6 +403,21 @@ window.addEventListener('message', (event) => {
             }
 
             if (result.success) {
+                if (result.rewardContext && result.rewardContext.type === 'crate') {
+                    const purchasedItem = state.selectedItem;
+                    closeModal();
+                    state.selectedItem = null;
+                    playCrateAnimation(purchasedItem, result.rewardContext);
+                } else {
+                    modalFeedback.style.color = '#7dffb3';
+                    modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
+                    addActivityEntry(`✅ ${state.selectedItem.label}`, true);
+                    setTimeout(() => {
+                        modalFeedback.textContent = '';
+                        closeModal();
+                        state.selectedItem = null;
+                    }, 1200);
+                }
                 modalFeedback.style.color = '#7dffb3';
                 modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
                 addActivityEntry(`✅ ${state.selectedItem.label}`, true);
@@ -247,6 +444,10 @@ window.addEventListener('message', (event) => {
 
 window.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
+        if (!crateOverlay.classList.contains('hidden')) {
+            closeCrateOverlay();
+            return;
+        }
         fetch(`https://${GetParentResourceName()}/closeMarket`, {
             method: 'POST',
             body: JSON.stringify({})

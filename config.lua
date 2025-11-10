@@ -87,5 +87,337 @@ Config.ShopItems = {
                 neonEnabled = true
             }
         }
+    },
+    {
+        id = 'prototype_crate',
+        label = 'Skrzynia Prototypów',
+        price = 185,
+        icon = '🧪',
+        description = 'Eksperymentalne komponenty i konceptowe pojazdy z laboratorium Ghost.',
+        rewardData = {
+            type = 'crate',
+            crateLabel = 'Skrzynia Prototypów',
+            animation = 'prototype',
+            highlight = '#62f6ff',
+            pool = {
+                {
+                    id = 'specter_proto_crate',
+                    label = 'Specter-X Prototyp',
+                    icon = '🚗',
+                    rarity = 'mityczny',
+                    weight = 6,
+                    reward = {
+                        type = 'vehicle',
+                        model = 'specter',
+                        props = {
+                            colorPrimary = 147,
+                            colorSecondary = 12,
+                            pearlescentColor = 111,
+                            neonEnabled = true
+                        }
+                    }
+                },
+                {
+                    id = 'quantum_boost',
+                    label = 'Quantum Nitro',
+                    icon = '⚡',
+                    rarity = 'epicki',
+                    weight = 14,
+                    reward = {
+                        type = 'item',
+                        item = 'nitro',
+                        count = 2
+                    }
+                },
+                {
+                    id = 'lab_cash',
+                    label = 'Grant Badawczy',
+                    icon = '💰',
+                    rarity = 'rzadki',
+                    weight = 22,
+                    reward = {
+                        type = 'money',
+                        account = 'money',
+                        amount = 75000
+                    }
+                },
+                {
+                    id = 'lab_access',
+                    label = 'Dostęp Lab: Overseer',
+                    icon = '🛰️',
+                    rarity = 'legendarny',
+                    weight = 10,
+                    reward = {
+                        type = 'group',
+                        group = 'ghost.overseer'
+                    }
+                },
+                {
+                    id = 'prototype_supply',
+                    label = 'Pakiet Materiałów',
+                    icon = '📦',
+                    rarity = 'niepospolity',
+                    weight = 26,
+                    reward = {
+                        type = 'item',
+                        item = 'metalscrap',
+                        count = 20
+                    }
+                },
+                {
+                    id = 'prototype_tokens',
+                    label = 'Żetony Ghost',
+                    icon = '💎',
+                    rarity = 'pospolity',
+                    weight = 22,
+                    reward = {
+                        type = 'money',
+                        account = 'money',
+                        amount = 40000
+                    }
+                }
+            }
+        }
+    },
+    {
+        id = 'vehicle_crate',
+        label = 'Skrzynia Aut',
+        price = 145,
+        icon = '🚙',
+        description = 'Pakiet pojazdów drogowych i luksusowych dodatków do garażu.',
+        rewardData = {
+            type = 'crate',
+            crateLabel = 'Skrzynia Aut',
+            animation = 'garage',
+            highlight = '#7dffb3',
+            pool = {
+                {
+                    id = 'paragon_car',
+                    label = 'Enus Paragon R',
+                    icon = '🏎️',
+                    rarity = 'legendarny',
+                    weight = 8,
+                    reward = {
+                        type = 'vehicle',
+                        model = 'paragon',
+                        props = {
+                            colorPrimary = 29,
+                            colorSecondary = 111
+                        }
+                    }
+                },
+                {
+                    id = 'comet_car',
+                    label = 'Pfister Comet SR',
+                    icon = '🚘',
+                    rarity = 'epicki',
+                    weight = 12,
+                    reward = {
+                        type = 'vehicle',
+                        model = 'comet5'
+                    }
+                },
+                {
+                    id = 'drift_kit',
+                    label = 'Pakiet Driftowy',
+                    icon = '🛞',
+                    rarity = 'rzadki',
+                    weight = 20,
+                    reward = {
+                        type = 'item',
+                        item = 'driftkit',
+                        count = 1
+                    }
+                },
+                {
+                    id = 'fuel_tokens',
+                    label = 'Bony Paliwowe',
+                    icon = '⛽',
+                    rarity = 'niepospolity',
+                    weight = 25,
+                    reward = {
+                        type = 'item',
+                        item = 'fuel',
+                        count = 5
+                    }
+                },
+                {
+                    id = 'garage_cash',
+                    label = 'Budżet Garażowy',
+                    icon = '💵',
+                    rarity = 'pospolity',
+                    weight = 35,
+                    reward = {
+                        type = 'money',
+                        account = 'money',
+                        amount = 60000
+                    }
+                }
+            }
+        }
+    },
+    {
+        id = 'pistol_crate',
+        label = 'Skrzynka Arsenału',
+        price = 95,
+        icon = '🔫',
+        description = 'Selektor krótkiej broni palnej z bonusowym wyposażeniem.',
+        rewardData = {
+            type = 'crate',
+            crateLabel = 'Skrzynka Arsenału',
+            animation = 'arsenal',
+            highlight = '#ff9f68',
+            pool = {
+                {
+                    id = 'pistol_mk2',
+                    label = 'Pistolet MK II',
+                    icon = '🔧',
+                    rarity = 'epicki',
+                    weight = 12,
+                    reward = {
+                        type = 'weapon',
+                        weapon = 'weapon_pistol_mk2',
+                        ammo = 160
+                    }
+                },
+                {
+                    id = 'heavy_pistol',
+                    label = 'Ciężki Pistolet',
+                    icon = '💥',
+                    rarity = 'rzadki',
+                    weight = 18,
+                    reward = {
+                        type = 'weapon',
+                        weapon = 'weapon_heavypistol',
+                        ammo = 120
+                    }
+                },
+                {
+                    id = 'sns_pistol',
+                    label = 'Pistolet SNS',
+                    icon = '🕵️',
+                    rarity = 'niepospolity',
+                    weight = 26,
+                    reward = {
+                        type = 'weapon',
+                        weapon = 'weapon_snspistol',
+                        ammo = 80
+                    }
+                },
+                {
+                    id = 'ammo_pack',
+                    label = 'Pakiet Amunicji',
+                    icon = '🎯',
+                    rarity = 'pospolity',
+                    weight = 24,
+                    reward = {
+                        type = 'item',
+                        item = 'ammo-9mm',
+                        count = 50
+                    }
+                },
+                {
+                    id = 'weapon_tokens',
+                    label = 'Token Szkoleniowy',
+                    icon = '🎖️',
+                    rarity = 'legendarny',
+                    weight = 10,
+                    reward = {
+                        type = 'group',
+                        group = 'ghost.weapons'
+                    }
+                }
+            }
+        }
+    },
+    {
+        id = 'limited_crate',
+        label = 'Skrzynia Limitek',
+        price = 210,
+        icon = '🎁',
+        description = 'Ekskluzywne nagrody limitowane czasowo i kolekcjonerskie.',
+        rewardData = {
+            type = 'crate',
+            crateLabel = 'Skrzynia Limitek',
+            animation = 'limited',
+            highlight = '#f86bff',
+            pool = {
+                {
+                    id = 'ghost_suit',
+                    label = 'Kombinezon Ghost Prime',
+                    icon = '🧥',
+                    rarity = 'mityczny',
+                    weight = 8,
+                    reward = {
+                        type = 'item',
+                        item = 'ghost_suit',
+                        count = 1
+                    }
+                },
+                {
+                    id = 'ghost_vip',
+                    label = 'Przepustka VIP',
+                    icon = '💳',
+                    rarity = 'legendarny',
+                    weight = 12,
+                    reward = {
+                        type = 'group',
+                        group = 'ghost.vip'
+                    }
+                },
+                {
+                    id = 'ghost_coin_cache',
+                    label = 'Skarbiec Ghost Coins',
+                    icon = '💎',
+                    rarity = 'epicki',
+                    weight = 18,
+                    reward = {
+                        type = 'money',
+                        account = 'money',
+                        amount = 120000
+                    }
+                },
+                {
+                    id = 'exclusive_vehicle',
+                    label = 'Elegy Retro Custom',
+                    icon = '🚘',
+                    rarity = 'rzadki',
+                    weight = 16,
+                    reward = {
+                        type = 'vehicle',
+                        model = 'elegy',
+                        props = {
+                            colorPrimary = 145,
+                            colorSecondary = 13,
+                            neonEnabled = true
+                        }
+                    }
+                },
+                {
+                    id = 'limited_art',
+                    label = 'Holograficzny Obraz',
+                    icon = '🖼️',
+                    rarity = 'niepospolity',
+                    weight = 22,
+                    reward = {
+                        type = 'item',
+                        item = 'art_holo',
+                        count = 1
+                    }
+                },
+                {
+                    id = 'limited_tokens',
+                    label = 'Token Eventowy',
+                    icon = '🎟️',
+                    rarity = 'pospolity',
+                    weight = 24,
+                    reward = {
+                        type = 'item',
+                        item = 'event_token',
+                        count = 3
+                    }
+                }
+            }
+        }
     }
 }

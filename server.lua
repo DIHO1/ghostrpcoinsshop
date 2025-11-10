@@ -16,6 +16,11 @@ end
 
 local purchaseCooldowns = {}
 
+math.randomseed(os.time())
+math.random()
+math.random()
+math.random()
+
 CreateThread(function()
     exports.oxmysql:execute([[CREATE TABLE IF NOT EXISTS `ghost_shop_wallet` (
         `identifier` VARCHAR(64) NOT NULL,
@@ -126,27 +131,14 @@ local function removeCoins(identifier, amount, cb)
     end)
 end
 
-local function distributeReward(playerSource, rewardData)
-    if not rewardData or not rewardData.type then
-        return false, 'invalid_reward'
-    end
-
-    if not ESX then
-        return false, 'framework_unavailable'
-    end
-
-    local xPlayer = ESX.GetPlayerFromId(playerSource)
-    if not xPlayer then
-        return false, 'player_not_found'
-    end
-
+local function giveDirectReward(xPlayer, rewardData)
     local rewardType = rewardData.type
 
     if rewardType == 'item' then
         if rewardData.item then
             local count = rewardData.count or 1
             xPlayer.addInventoryItem(rewardData.item, count)
-            return true
+            return true, { rewardType = 'item' }
         end
         return false, 'invalid_item'
     elseif rewardType == 'money' then
@@ -162,23 +154,114 @@ local function distributeReward(playerSource, rewardData)
             xPlayer.addAccountMoney(account, amount)
         end
 
-        return true
+        return true, { rewardType = 'money', amount = amount, account = account }
     elseif rewardType == 'group' then
         if rewardData.group then
             local identifier = getPlayerIdentifier(xPlayer)
             if identifier then
                 ExecuteCommand(('add_ace %s %s allow'):format(identifier, rewardData.group))
-                return true
+                return true, { rewardType = 'group', group = rewardData.group }
             end
         end
         return false, 'invalid_group'
     elseif rewardType == 'vehicle' then
         print(('[Ghost Market] Gracz %s (%s) zakupił pojazd %s. Zintegruj nagrodę z zewnętrznym systemem garażu.')
             :format(xPlayer.getName(), getPlayerIdentifier(xPlayer) or 'unknown', rewardData.model or 'unknown'))
-        return true
-    else
-        return false, 'unknown_type'
+        return true, { rewardType = 'vehicle', model = rewardData.model }
+    elseif rewardType == 'weapon' then
+        if rewardData.weapon then
+            local ammo = rewardData.ammo or 0
+            xPlayer.addWeapon(rewardData.weapon, ammo)
+            return true, { rewardType = 'weapon', weapon = rewardData.weapon }
+        end
+        return false, 'invalid_weapon'
     end
+
+    return false, 'unknown_type'
+end
+
+local function selectCrateEntry(pool)
+    if type(pool) ~= 'table' or #pool == 0 then
+        return nil
+    end
+
+    local totalWeight = 0
+    for _, entry in ipairs(pool) do
+        totalWeight = totalWeight + (entry.weight or 1)
+    end
+
+    if totalWeight <= 0 then
+        return nil
+    end
+
+    local roll = math.random() * totalWeight
+    local cumulative = 0
+
+    for _, entry in ipairs(pool) do
+        cumulative = cumulative + (entry.weight or 1)
+        if roll <= cumulative then
+            return entry
+        end
+    end
+
+    return pool[#pool]
+end
+
+local function processReward(xPlayer, rewardData)
+    if not rewardData or not rewardData.type then
+        return false, 'invalid_reward'
+    end
+
+    if rewardData.type == 'crate' then
+        local pool = rewardData.pool
+        local selectedEntry = selectCrateEntry(pool)
+
+        if not selectedEntry or not selectedEntry.reward then
+            return false, 'invalid_crate'
+        end
+
+        local success, nestedInfo = processReward(xPlayer, selectedEntry.reward)
+        if not success then
+            return false, nestedInfo or 'crate_failed'
+        end
+
+        local crateInfo = {
+            type = 'crate',
+            crateLabel = rewardData.crateLabel or rewardData.label or 'Skrzynia',
+            animation = rewardData.animation,
+            highlight = rewardData.highlight,
+            selection = {
+                id = selectedEntry.id,
+                label = selectedEntry.label,
+                icon = selectedEntry.icon,
+                rarity = selectedEntry.rarity,
+                rewardType = nestedInfo and nestedInfo.rewardType or (selectedEntry.reward and selectedEntry.reward.type),
+                rewardDetails = nestedInfo
+            },
+            poolPreview = pool
+        }
+
+        return true, crateInfo
+    end
+
+    return giveDirectReward(xPlayer, rewardData)
+end
+
+local function distributeReward(playerSource, rewardData)
+    if not rewardData or not rewardData.type then
+        return false, 'invalid_reward'
+    end
+
+    if not ESX then
+        return false, 'framework_unavailable'
+    end
+
+    local xPlayer = ESX.GetPlayerFromId(playerSource)
+    if not xPlayer then
+        return false, 'player_not_found'
+    end
+
+    return processReward(xPlayer, rewardData)
 end
 
 exports('GetCoins', function(identifier, cb)
@@ -375,11 +458,11 @@ RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
                 return
             end
 
-            local rewarded, rewardReason = distributeReward(src, selectedItem.rewardData)
+            local rewarded, rewardDetailsOrReason = distributeReward(src, selectedItem.rewardData)
             if not rewarded then
                 addCoins(identifier, selectedItem.price, function()
                     getCoins(identifier, function(refundBalance)
-                        TriggerClientEvent('ghostmarket:purchaseResult', src, { success = false, reason = rewardReason or 'reward_failed', balance = refundBalance })
+                        TriggerClientEvent('ghostmarket:purchaseResult', src, { success = false, reason = rewardDetailsOrReason or 'reward_failed', balance = refundBalance })
                     end)
                 end)
                 return
@@ -390,13 +473,21 @@ RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
             print(('[Ghost Market] Gracz %s (%s) kupił %s za %d %s.')
                 :format(xPlayer.getName(), identifier, selectedItem.label, selectedItem.price, Config.Currency.symbol))
 
+            if type(rewardDetailsOrReason) == 'table' and rewardDetailsOrReason.type == 'crate' then
+                local selection = rewardDetailsOrReason.selection or {}
+                print(('[Ghost Market]   › Skrzynia %s wylosowała %s (%s).')
+                    :format(rewardDetailsOrReason.crateLabel or selectedItem.label,
+                        selection.label or 'nieznana nagroda', selection.rarity or 'brak rzadkości'))
+            end
+
             TriggerClientEvent('ghostmarket:purchaseResult', src, {
                 success = true,
                 balance = newBalance,
                 item = {
                     id = selectedItem.id,
                     label = selectedItem.label
-                }
+                },
+                rewardContext = rewardDetailsOrReason
             })
         end)
     end)

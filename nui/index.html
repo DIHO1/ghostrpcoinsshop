@@ -90,6 +90,29 @@
         </div>
     </div>
 
+    <div id="crateOverlay" class="crate-overlay hidden">
+        <div class="crate-screen">
+            <header class="crate-header">
+                <span class="crate-title" id="crateTitle">Skrzynia</span>
+                <button class="crate-close" id="crateClose" aria-label="Zamknij">×</button>
+            </header>
+            <div class="crate-body">
+                <div class="crate-reel" id="crateReel">
+                    <div class="crate-indicator"></div>
+                    <div class="crate-track" id="crateTrack"></div>
+                </div>
+                <div class="crate-summary" id="crateSummary">
+                    <span class="crate-item-icon" id="crateRewardIcon">🎁</span>
+                    <div class="crate-item-details">
+                        <span class="crate-item-label" id="crateRewardLabel">Nagroda</span>
+                        <span class="crate-item-rarity" id="crateRewardRarity"></span>
+                    </div>
+                    <button class="btn ghost" id="crateContinue">Kontynuuj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
