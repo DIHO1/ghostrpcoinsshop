@@ -16,20 +16,6 @@ end
 
 local purchaseCooldowns = {}
 
-CreateThread(function()
-    exports.oxmysql:execute([[CREATE TABLE IF NOT EXISTS `ghost_shop_wallet` (
-        `identifier` VARCHAR(64) NOT NULL,
-        `coins` INT NOT NULL DEFAULT 0,
-        PRIMARY KEY (`identifier`)
-    )]], {}, function(result)
-        if result ~= nil then
-            print('[Ghost Market] Tabela ghost_shop_wallet została zweryfikowana.')
-        else
-            print('[Ghost Market] Nie udało się utworzyć/zweryfikować tabeli ghost_shop_wallet. Sprawdź konfigurację bazy danych')
-        end
-    end)
-end)
-
 local function getPlayerIdentifier(xPlayer)
     return xPlayer and xPlayer.identifier
 end
@@ -158,116 +144,6 @@ end)
 exports('DistributeReward', function(playerSource, rewardData)
     return distributeReward(playerSource, rewardData)
 end)
-
-local function checkAdminPermission(src)
-    if src == 0 then
-        return true
-    end
-
-    if not Config.Admin or not Config.Admin.requiredAce then
-        return true
-    end
-
-    return IsPlayerAceAllowed(src, Config.Admin.requiredAce)
-end
-
-local function resolveIdentifierFromArg(arg, invoker)
-    if arg and arg ~= '' then
-        if ESX and tonumber(arg) then
-            local xPlayer = ESX.GetPlayerFromId(tonumber(arg))
-            if xPlayer then
-                local identifier = getPlayerIdentifier(xPlayer)
-                if identifier then
-                    return identifier
-                end
-            end
-        end
-
-        return arg
-    end
-
-    if invoker and invoker > 0 and ESX then
-        local xPlayer = ESX.GetPlayerFromId(invoker)
-        if xPlayer then
-            return getPlayerIdentifier(xPlayer)
-        end
-    end
-
-    return nil
-end
-
-local function adminFeedback(message)
-    print(('[Ghost Market] %s'):format(message))
-end
-
-local adminCommand = Config.Admin and Config.Admin.command or nil
-if adminCommand and adminCommand ~= '' then
-    RegisterCommand(adminCommand, function(source, args)
-        if not checkAdminPermission(source) then
-            adminFeedback('Odmowa dostepu do polecenia administracyjnego.')
-            return
-        end
-
-        local action = (args[1] or ''):lower()
-        local identifier = resolveIdentifierFromArg(args[2], source)
-
-        if action == '' or not identifier then
-            adminFeedback(('Uzycie: /%s <add|remove|set|show> [identifier] <amount>'):format(adminCommand))
-            return
-        end
-
-        if action == 'show' then
-            getCoins(identifier, function(balance)
-                adminFeedback(('Saldo %s: %d %s'):format(identifier, balance, Config.Currency.symbol))
-            end)
-            return
-        end
-
-        if action == 'add' then
-            local amount = tonumber(args[3])
-            if not amount or amount <= 0 then
-                adminFeedback('Podaj dodatnia liczbe monet do przetworzenia.')
-                return
-            end
-
-            addCoins(identifier, amount, function(success, balance)
-                if success then
-                    adminFeedback(('Dodano %d %s dla %s (nowe saldo: %d).'):format(amount, Config.Currency.symbol, identifier, balance or 0))
-                else
-                    adminFeedback('Nie udalo sie dodac monet.')
-                end
-            end)
-        elseif action == 'remove' then
-            local amount = tonumber(args[3])
-            if not amount or amount <= 0 then
-                adminFeedback('Podaj dodatnia liczbe monet do przetworzenia.')
-                return
-            end
-
-            removeCoins(identifier, amount, function(success, balance)
-                if success then
-                    adminFeedback(('Usunieto %d %s z konta %s (nowe saldo: %d).'):format(amount, Config.Currency.symbol, identifier, balance or 0))
-                else
-                    adminFeedback('Nie udalo sie usunac monet. Sprawdz saldo.')
-                end
-            end)
-        elseif action == 'set' then
-            local amount = tonumber(args[3])
-            if amount == nil or amount < 0 then
-                adminFeedback('Podaj prawidlowa wartosc salda (0 lub wiecej).')
-                return
-            end
-
-            ensureWallet(identifier, function()
-                exports.oxmysql:execute('UPDATE ghost_shop_wallet SET coins = ? WHERE identifier = ?', {amount, identifier}, function()
-                    adminFeedback(('Ustawiono saldo %s na %d %s.'):format(identifier, amount, Config.Currency.symbol))
-                end)
-            end)
-        else
-            adminFeedback(('Nieznana akcja %s. Dostepne: add, remove, set, show.'):format(action))
-        end
-    end, true)
-end
 
 RegisterNetEvent('ghostmarket:requestWallet', function()
     local src = source
