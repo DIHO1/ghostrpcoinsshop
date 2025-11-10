@@ -640,6 +640,7 @@ window.addEventListener('message', (event) => {
             break;
         }
         case 'purchaseResult': {
+        case 'purchaseResult':
             const result = data.result || {};
             if (typeof result.balance === 'number') {
                 setWallet(result.balance);
