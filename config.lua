@@ -4,6 +4,11 @@ Config = {}
 Config.Framework = 'esx'
 Config.OpenCommand = 'market'
 
+-- Administrative command configuration (server side)
+Config.Admin = {
+    command = 'ghostcoins',
+    requiredAce = 'ghostmarket.admin'
+}
 
 -- Currency configuration
 Config.Currency = {

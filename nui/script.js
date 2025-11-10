@@ -2,7 +2,9 @@ const state = {
     items: [],
     currency: { symbol: '💎', name: 'Ghost Coin' },
     selectedItem: null,
-    wallet: 0
+    wallet: 0,
+    activeView: 'overview',
+    activity: []
 };
 
 const app = document.getElementById('app');
@@ -14,6 +16,11 @@ const modalDescription = document.getElementById('modalDescription');
 const modalFeedback = document.getElementById('modalFeedback');
 const confirmPurchase = document.getElementById('confirmPurchase');
 const cancelPurchase = document.getElementById('cancelPurchase');
+const nav = document.getElementById('viewNav');
+const navGlow = document.getElementById('navGlow');
+const navButtons = nav ? nav.querySelectorAll('.nav-item') : [];
+const viewPanels = document.querySelectorAll('.view-panel');
+const activityLog = document.getElementById('activityLog');
 
 function formatPrice(amount) {
     return `${state.currency.symbol} ${amount}`;
@@ -29,6 +36,14 @@ function setWallet(amount) {
 
 function renderItems() {
     itemsContainer.innerHTML = '';
+
+    if (!state.items.length) {
+        const empty = document.createElement('p');
+        empty.className = 'placeholder';
+        empty.textContent = 'Aktualnie brak towaru do zakupu.';
+        itemsContainer.appendChild(empty);
+        return;
+    }
 
     state.items.forEach((item) => {
         const card = document.createElement('article');
@@ -48,6 +63,89 @@ function renderItems() {
         card.addEventListener('click', () => openModal(item));
         itemsContainer.appendChild(card);
     });
+}
+
+function moveNavGlow(target) {
+    if (!navGlow || !target) {
+        return;
+    }
+
+    const index = Number(target.dataset.index || 0);
+    navGlow.style.transform = `translateX(${index * 100}%)`;
+}
+
+function setActiveView(view) {
+    state.activeView = view;
+
+    viewPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.view === view);
+    });
+
+    navButtons.forEach((button) => {
+        const isActive = button.dataset.view === view;
+        button.classList.toggle('active', isActive);
+        if (isActive) {
+            moveNavGlow(button);
+        }
+    });
+
+    if (view === 'shop') {
+        renderItems();
+    }
+}
+
+function addActivityEntry(label, success) {
+    if (!activityLog) {
+        return;
+    }
+
+    if (activityLog.querySelector('.placeholder')) {
+        activityLog.innerHTML = '';
+    }
+
+    const entry = document.createElement('div');
+    entry.className = 'activity-entry';
+
+    const message = document.createElement('span');
+    message.className = 'label';
+    message.textContent = label;
+
+    const time = document.createElement('span');
+    time.className = 'time';
+    time.textContent = new Date().toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+
+    if (!success) {
+        message.style.color = '#ff416c';
+    }
+
+    entry.appendChild(message);
+    entry.appendChild(time);
+    activityLog.prepend(entry);
+
+    state.activity.unshift({ label, success, createdAt: Date.now() });
+    if (state.activity.length > 8) {
+        state.activity.pop();
+        const lastEntry = activityLog.querySelector('.activity-entry:last-of-type');
+        if (lastEntry) {
+            lastEntry.remove();
+        }
+    }
+}
+
+navButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+        const view = button.dataset.view;
+        setActiveView(view);
+    });
+});
+
+if (navButtons.length > 0) {
+    if (navGlow) {
+        navGlow.style.width = `${100 / navButtons.length}%`;
+    }
+
+    const activeButton = document.querySelector('.nav-item.active') || navButtons[0];
+    moveNavGlow(activeButton);
 }
 
 function openModal(item) {
@@ -97,13 +195,14 @@ window.addEventListener('message', (event) => {
             state.currency = data.currency || state.currency;
             document.body.classList.add('market-active');
             app.classList.remove('hidden');
-            renderItems();
+            setActiveView('shop');
             setWallet(state.wallet);
             break;
         case 'close':
             app.classList.add('hidden');
             closeModal();
             document.body.classList.remove('market-active');
+            setActiveView('overview');
             break;
         case 'updateWallet':
             state.currency = data.currency || state.currency;
@@ -124,6 +223,7 @@ window.addEventListener('message', (event) => {
             if (result.success) {
                 modalFeedback.style.color = '#7dffb3';
                 modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
+                addActivityEntry(`✅ ${state.selectedItem.label}`, true);
                 setTimeout(() => {
                     modalFeedback.textContent = '';
                     closeModal();
@@ -139,6 +239,7 @@ window.addEventListener('message', (event) => {
                     framework_unavailable: 'Framework niedostępny.'
                 };
                 modalFeedback.textContent = messages[result.reason] || 'Zakup nieudany.';
+                addActivityEntry(`⛔ ${state.selectedItem.label}`, false);
             }
             break;
     }
