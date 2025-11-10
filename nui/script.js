@@ -598,101 +598,101 @@ window.addEventListener('message', (event) => {
         return;
     }
 
-    switch (data.action) {
-        case 'open': {
-            state.items = Array.isArray(data.items) ? data.items : [];
-            state.itemLookup = {};
-            state.items.forEach((item) => {
-                state.itemLookup[item.id] = item;
-            });
-            state.currency = data.currency || state.currency;
-            state.layout = data.layout || state.layout;
+    const action = data.action;
 
-            document.body.classList.add('market-active');
-            if (app) {
-                app.classList.remove('hidden');
-            }
+    if (action === 'open') {
+        state.items = Array.isArray(data.items) ? data.items : [];
+        state.itemLookup = {};
+        state.items.forEach((item) => {
+            state.itemLookup[item.id] = item;
+        });
+        state.currency = data.currency || state.currency;
+        state.layout = data.layout || state.layout;
 
-            applyHeroLayout();
-            renderSections();
-            if (typeof data.balance === 'number') {
-                setWallet(data.balance);
-            } else {
-                setWallet(state.wallet);
-            }
-            resetActivityPlaceholder();
-            break;
+        document.body.classList.add('market-active');
+        if (app) {
+            app.classList.remove('hidden');
         }
-        case 'close': {
-            if (app) {
-                app.classList.add('hidden');
-            }
-            document.body.classList.remove('market-active');
-            closeModal();
-            resetCrateOverlay();
-            break;
-        }
-        case 'updateWallet': {
-            state.currency = data.currency || state.currency;
-            if (typeof data.balance === 'number') {
-                setWallet(data.balance);
-            }
-            break;
-        }
-        case 'purchaseResult': {
-        case 'purchaseResult':
-            const result = data.result || {};
-            if (typeof result.balance === 'number') {
-                setWallet(result.balance);
-            }
 
-            if (!state.selectedItem) {
-                break;
-            }
+        applyHeroLayout();
+        renderSections();
+        if (typeof data.balance === 'number') {
+            setWallet(data.balance);
+        } else {
+            setWallet(state.wallet);
+        }
+        resetActivityPlaceholder();
+        return;
+    }
 
-            if (result.success) {
-                if (result.rewardContext && result.rewardContext.type === 'crate') {
-                    const purchasedItem = state.selectedItem;
-                    closeModal();
-                    state.selectedItem = null;
-                    playCrateAnimation(purchasedItem, result.rewardContext);
-                } else {
-                    if (modalFeedback) {
-                        modalFeedback.style.color = '#4be7b0';
-                        modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
-                    }
-                    addActivityEntry(`✅ ${state.selectedItem.label}`, true);
-                    setTimeout(() => {
-                        closeModal();
-                        state.selectedItem = null;
-                    }, 1100);
-                }
+    if (action === 'close') {
+        if (app) {
+            app.classList.add('hidden');
+        }
+        document.body.classList.remove('market-active');
+        closeModal();
+        resetCrateOverlay();
+        return;
+    }
+
+    if (action === 'updateWallet') {
+        state.currency = data.currency || state.currency;
+        if (typeof data.balance === 'number') {
+            setWallet(data.balance);
+        }
+        return;
+    }
+
+    if (action === 'purchaseResult') {
+        const result = data.result || {};
+        if (typeof result.balance === 'number') {
+            setWallet(result.balance);
+        }
+
+        if (!state.selectedItem) {
+            return;
+        }
+
+        if (result.success) {
+            if (result.rewardContext && result.rewardContext.type === 'crate') {
+                const purchasedItem = state.selectedItem;
+                closeModal();
+                state.selectedItem = null;
+                playCrateAnimation(purchasedItem, result.rewardContext);
             } else {
                 if (modalFeedback) {
-                    modalFeedback.style.color = '#ff6f91';
-                    const messages = {
-                        insufficient_funds: 'Niewystarczająca liczba monet.',
-                        cooldown: 'Odczekaj chwilę przed kolejnym zakupem.',
-                        transaction_error: 'Błąd transakcji. Spróbuj ponownie.',
-                        reward_failed: 'Nie udało się dostarczyć nagrody.',
-                        item_not_found: 'Przedmiot niedostępny.',
-                        framework_unavailable: 'Framework niedostępny.'
-                    };
-                    modalFeedback.textContent = messages[result.reason] || 'Zakup nieudany.';
+                    modalFeedback.style.color = '#4be7b0';
+                    modalFeedback.textContent = `Zakupiono ${state.selectedItem.label}!`;
                 }
-                addActivityEntry(`⛔ ${state.selectedItem.label}`, false);
+                addActivityEntry(`✅ ${state.selectedItem.label}`, true);
+                setTimeout(() => {
+                    closeModal();
+                    state.selectedItem = null;
+                }, 1100);
             }
-            break;
-        }
-        case 'crateReveal': {
-            const result = data.result || {};
-            if (result.rewardContext && result.rewardContext.type === 'crate' && state.selectedItem) {
-                playCrateAnimation(state.selectedItem, result.rewardContext);
+        } else {
+            if (modalFeedback) {
+                modalFeedback.style.color = '#ff6f91';
+                const messages = {
+                    insufficient_funds: 'Niewystarczająca liczba monet.',
+                    cooldown: 'Odczekaj chwilę przed kolejnym zakupem.',
+                    transaction_error: 'Błąd transakcji. Spróbuj ponownie.',
+                    reward_failed: 'Nie udało się dostarczyć nagrody.',
+                    item_not_found: 'Przedmiot niedostępny.',
+                    framework_unavailable: 'Framework niedostępny.'
+                };
+                modalFeedback.textContent = messages[result.reason] || 'Zakup nieudany.';
             }
-            break;
+            addActivityEntry(`⛔ ${state.selectedItem.label}`, false);
         }
-        default:
-            break;
+        return;
+    }
+
+    if (action === 'crateReveal') {
+        const result = data.result || {};
+        if (result.rewardContext && result.rewardContext.type === 'crate' && state.selectedItem) {
+            playCrateAnimation(state.selectedItem, result.rewardContext);
+        }
     }
 });
 
