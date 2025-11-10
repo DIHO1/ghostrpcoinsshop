@@ -4,6 +4,7 @@ Config = {}
 Config.Framework = 'esx'
 Config.OpenCommand = 'market'
 
+
 -- Currency configuration
 Config.Currency = {
     name = 'Ghost Coin',
