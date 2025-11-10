@@ -10,6 +10,11 @@ Config.Admin = {
     requiredAce = 'ghostmarket.admin'
 }
 
+Config.EventTimer = {
+    command = 'marketevent',
+    requiredAce = 'ghostmarket.admin'
+}
+
 -- Currency configuration
 Config.Currency = {
     name = 'Ghost Coin',
@@ -28,7 +33,11 @@ Config.Layout = {
         badge = 'Nowe skrzynki eventowe',
         title = 'Nowe skrzynki eventowe - ograniczone czasowo!',
         subtitle = 'Sprawdź, które pakiety znikną z oferty Ghost Market jeszcze w tym tygodniu.',
-        countdown = 'Koniec za: 04d 10h 05m',
+        countdown = {
+            label = 'Koniec za:',
+            fallback = 'Wkrótce',
+            eventKey = 'hero_event'
+        },
         primaryCTA = { label = 'Sprawdź skrzynki', target = 'event_crates' },
         secondaryCTA = { label = 'Kup pojazd', target = 'vehicles' },
         featuredItems = {

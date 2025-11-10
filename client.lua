@@ -3,6 +3,7 @@ local Config = Config
 local isOpen = false
 local hasFocus = false
 local currentBalance = 0
+local currentEventState = {}
 
 local function toggleFocus(state)
     hasFocus = state
@@ -10,6 +11,21 @@ local function toggleFocus(state)
     if SetNuiFocusKeepInput then
         SetNuiFocusKeepInput(false)
     end
+end
+
+local function sendEventStateToNui()
+    if not currentEventState then
+        return
+    end
+
+    if not isOpen then
+        return
+    end
+
+    SendNUIMessage({
+        action = 'updateEventState',
+        state = currentEventState
+    })
 end
 
 local function openMarket()
@@ -22,10 +38,13 @@ local function openMarket()
         action = 'open',
         items = Config.ShopItems,
         currency = Config.Currency,
-        layout = Config.Layout
+        layout = Config.Layout,
+        eventState = currentEventState
     })
 
     TriggerServerEvent('ghostmarket:requestWallet')
+    TriggerServerEvent('ghostmarket:requestEventState')
+    sendEventStateToNui()
 end
 
 local function closeMarket()
@@ -69,6 +88,18 @@ RegisterNetEvent('ghostmarket:updateWallet', function(balance)
         balance = currentBalance,
         currency = Config.Currency
     })
+end)
+
+RegisterNetEvent('ghostmarket:updateEventState', function(state)
+    if type(state) ~= 'table' then
+        return
+    end
+
+    for key, value in pairs(state) do
+        currentEventState[key] = value
+    end
+
+    sendEventStateToNui()
 end)
 
 RegisterNetEvent('ghostmarket:purchaseResult', function(result)
@@ -116,3 +147,8 @@ AddEventHandler('onResourceStop', function(resourceName)
 end)
 
 RegisterKeyMapping(Config.OpenCommand, 'Otwórz Ghost Market', 'keyboard', 'F7')
+
+CreateThread(function()
+    Wait(2000)
+    TriggerServerEvent('ghostmarket:requestEventState')
+end)

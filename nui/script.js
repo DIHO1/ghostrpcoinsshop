@@ -6,7 +6,11 @@ const state = {
     selectedItem: null,
     wallet: 0,
     activity: [],
-    crateAnimation: null
+    crateAnimation: null,
+    heroCountdownConfig: null,
+    heroCountdownRuntime: null,
+    heroCountdownResolved: null,
+    heroCountdownTimer: null
 };
 
 const app = document.getElementById('app');
@@ -174,6 +178,172 @@ function renderHeroFeatured() {
     });
 }
 
+function clearHeroCountdownTimer() {
+    if (state.heroCountdownTimer) {
+        clearInterval(state.heroCountdownTimer);
+        state.heroCountdownTimer = null;
+    }
+}
+
+function computeCountdownSnapshot(endAt) {
+    if (typeof endAt !== 'number') {
+        return null;
+    }
+
+    const diff = endAt - Date.now();
+    if (!Number.isFinite(diff)) {
+        return null;
+    }
+
+    if (diff <= 0) {
+        return { completed: true };
+    }
+
+    const totalSeconds = Math.floor(diff / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    let text;
+    if (days > 0) {
+        text = `${String(days).padStart(2, '0')}d ${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m`;
+    } else {
+        text = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+    }
+
+    return { completed: false, text };
+}
+
+function updateHeroCountdownLabel(label, fallback, endAt) {
+    if (!heroCountdown) {
+        return false;
+    }
+
+    const finalLabel = (typeof label === 'string' && label.trim() !== '') ? label.trim() : '';
+    const fallbackText = (typeof fallback === 'string' && fallback.trim() !== '') ? fallback.trim() : '';
+
+    if (!endAt) {
+        if (fallbackText) {
+            heroCountdown.textContent = finalLabel ? `${finalLabel} ${fallbackText}` : fallbackText;
+        } else {
+            heroCountdown.textContent = finalLabel;
+        }
+        return false;
+    }
+
+    const snapshot = computeCountdownSnapshot(endAt);
+    if (!snapshot) {
+        if (fallbackText) {
+            heroCountdown.textContent = finalLabel ? `${finalLabel} ${fallbackText}` : fallbackText;
+        } else {
+            heroCountdown.textContent = finalLabel;
+        }
+        return false;
+    }
+
+    if (snapshot.completed) {
+        heroCountdown.textContent = finalLabel ? `${finalLabel} Zakończono` : 'Zakończono';
+        return true;
+    }
+
+    heroCountdown.textContent = finalLabel ? `${finalLabel} ${snapshot.text}` : snapshot.text;
+    return false;
+}
+
+function refreshHeroCountdown() {
+    clearHeroCountdownTimer();
+
+    const config = state.heroCountdownConfig;
+    const runtime = state.heroCountdownRuntime;
+
+    let label = '';
+    let fallback = '';
+
+    if (typeof config === 'string') {
+        label = config;
+    } else if (config && typeof config === 'object') {
+        if (typeof config.label === 'string') {
+            label = config.label;
+        }
+        if (typeof config.fallback === 'string') {
+            fallback = config.fallback;
+        }
+    }
+
+    if (runtime && typeof runtime === 'object') {
+        if (typeof runtime.label === 'string' && runtime.label.trim() !== '') {
+            label = runtime.label;
+        }
+        if (typeof runtime.fallback === 'string' && runtime.fallback.trim() !== '') {
+            fallback = runtime.fallback;
+        }
+    }
+
+    const endAt = runtime && typeof runtime.endAt === 'number' ? runtime.endAt : null;
+
+    state.heroCountdownResolved = { label, fallback, endAt };
+
+    const completed = updateHeroCountdownLabel(label, fallback, endAt);
+
+    if (endAt && !completed) {
+        state.heroCountdownTimer = setInterval(() => {
+            const done = updateHeroCountdownLabel(label, fallback, endAt);
+            if (done) {
+                clearHeroCountdownTimer();
+            }
+        }, 1000);
+    }
+}
+
+function normalizeRuntimeCountdown(runtime) {
+    if (!runtime || typeof runtime !== 'object') {
+        return {};
+    }
+
+    const normalized = {};
+
+    if (typeof runtime.label === 'string' && runtime.label.trim() !== '') {
+        normalized.label = runtime.label;
+    }
+
+    if (typeof runtime.fallback === 'string' && runtime.fallback.trim() !== '') {
+        normalized.fallback = runtime.fallback;
+    }
+
+    let endAt = Number(runtime.endAt);
+    if (!Number.isNaN(endAt) && endAt > 0) {
+        if (endAt < 1e12) {
+            endAt *= 1000;
+        }
+
+        let serverTime = Number(runtime.serverTime);
+        if (!Number.isNaN(serverTime) && serverTime > 0) {
+            if (serverTime < 1e12) {
+                serverTime *= 1000;
+            }
+
+            const offset = endAt - serverTime;
+            endAt = Date.now() + offset;
+        }
+
+        normalized.endAt = endAt;
+    }
+
+    return normalized;
+}
+
+function applyEventState(update) {
+    if (!update || typeof update !== 'object') {
+        return;
+    }
+
+    if (update.heroCountdown) {
+        state.heroCountdownRuntime = normalizeRuntimeCountdown(update.heroCountdown);
+        refreshHeroCountdown();
+    }
+}
+
 function applyHeroLayout() {
     const hero = state.layout && state.layout.hero ? state.layout.hero : {};
 
@@ -189,9 +359,8 @@ function applyHeroLayout() {
         heroSubtitle.textContent = hero.subtitle || '';
     }
 
-    if (heroCountdown) {
-        heroCountdown.textContent = hero.countdown || '';
-    }
+    state.heroCountdownConfig = hero.countdown || null;
+    refreshHeroCountdown();
 
     if (heroPrimary) {
         if (hero.primaryCTA) {
@@ -616,6 +785,9 @@ window.addEventListener('message', (event) => {
 
         applyHeroLayout();
         renderSections();
+        if (data.eventState) {
+            applyEventState(data.eventState);
+        }
         if (typeof data.balance === 'number') {
             setWallet(data.balance);
         } else {
@@ -632,6 +804,12 @@ window.addEventListener('message', (event) => {
         document.body.classList.remove('market-active');
         closeModal();
         resetCrateOverlay();
+        clearHeroCountdownTimer();
+        return;
+    }
+
+    if (action === 'updateEventState') {
+        applyEventState(data.state || data);
         return;
     }
 

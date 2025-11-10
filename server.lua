@@ -21,6 +21,153 @@ math.random()
 math.random()
 math.random()
 
+local heroCountdownConfig = Config.Layout and Config.Layout.hero and Config.Layout.hero.countdown or nil
+local HERO_EVENT_KEY = 'hero_event'
+if type(heroCountdownConfig) == 'table' and heroCountdownConfig.eventKey and heroCountdownConfig.eventKey ~= '' then
+    HERO_EVENT_KEY = heroCountdownConfig.eventKey
+end
+
+local heroCountdownEndAt
+
+local function currentUnixMillis()
+    return math.floor(os.time() * 1000)
+end
+
+local function formatDurationFromSeconds(seconds)
+    if not seconds or seconds <= 0 then
+        return '0s'
+    end
+
+    local remaining = seconds
+    local days = math.floor(remaining / 86400)
+    remaining = remaining % 86400
+    local hours = math.floor(remaining / 3600)
+    remaining = remaining % 3600
+    local minutes = math.floor(remaining / 60)
+    local secs = remaining % 60
+
+    local parts = {}
+    if days > 0 then table.insert(parts, ('%dd'):format(days)) end
+    if hours > 0 then table.insert(parts, ('%dh'):format(hours)) end
+    if minutes > 0 then table.insert(parts, ('%dm'):format(minutes)) end
+    if secs > 0 and days == 0 then table.insert(parts, ('%ds'):format(secs)) end
+
+    if #parts == 0 then
+        return ('%ds'):format(secs)
+    end
+
+    return table.concat(parts, ' ')
+end
+
+local function parseDurationToSeconds(arguments)
+    if not arguments or #arguments == 0 then
+        return nil
+    end
+
+    local joined = table.concat(arguments, ' '):lower()
+    if joined == '' then
+        return nil
+    end
+
+    local total = 0
+    local matched = false
+
+    for value, unit in joined:gmatch('(%d+)%s*([dhms])') do
+        local number = tonumber(value)
+        if number then
+            matched = true
+            if unit == 'd' then
+                total = total + (number * 86400)
+            elseif unit == 'h' then
+                total = total + (number * 3600)
+            elseif unit == 'm' then
+                total = total + (number * 60)
+            elseif unit == 's' then
+                total = total + number
+            end
+        end
+    end
+
+    if matched then
+        return total > 0 and total or nil
+    end
+
+    if joined:find(':', 1, true) then
+        local segments = {}
+        for segment in joined:gmatch('[^:]+') do
+            segments[#segments + 1] = segment
+        end
+
+        if #segments == 2 or #segments == 3 then
+            local hours = tonumber(segments[1]) or 0
+            local minutes = tonumber(segments[2]) or 0
+            local seconds = tonumber(segments[3] or '0') or 0
+            total = (hours * 3600) + (minutes * 60) + seconds
+            if total > 0 then
+                return total
+            end
+        end
+    end
+
+    local minutesValue = tonumber(joined)
+    if minutesValue and minutesValue > 0 then
+        return minutesValue * 60
+    end
+
+    return nil
+end
+
+local function buildEventStatePayload()
+    local payload = {
+        heroCountdown = {
+            endAt = heroCountdownEndAt,
+            serverTime = currentUnixMillis()
+        }
+    }
+
+    return payload
+end
+
+local function sendEventState(target)
+    local payload = buildEventStatePayload()
+
+    if target then
+        TriggerClientEvent('ghostmarket:updateEventState', target, payload)
+    else
+        TriggerClientEvent('ghostmarket:updateEventState', -1, payload)
+    end
+end
+
+local function loadHeroCountdown()
+    exports.oxmysql:fetch('SELECT end_at FROM ghost_shop_state WHERE event_key = ? LIMIT 1', {HERO_EVENT_KEY}, function(result)
+        local row = result and result[1]
+        if row and row.end_at then
+            local parsed = tonumber(row.end_at)
+            if parsed and parsed > 0 then
+                heroCountdownEndAt = parsed
+            else
+                heroCountdownEndAt = nil
+            end
+        else
+            heroCountdownEndAt = nil
+        end
+
+        sendEventState()
+
+        if heroCountdownEndAt then
+            local remainingMs = heroCountdownEndAt - currentUnixMillis()
+            if remainingMs > 0 then
+                local remainingSeconds = math.floor(remainingMs / 1000)
+                print(('[Ghost Market] Wczytano licznik wydarzenia (pozostało %s).'):format(formatDurationFromSeconds(remainingSeconds)))
+            else
+                print('[Ghost Market] Wczytano licznik wydarzenia (czas już upłynął).')
+            end
+        else
+            print('[Ghost Market] Brak aktywnego licznika wydarzenia przy starcie zasobu.')
+        end
+    end)
+end
+
 CreateThread(function()
     exports.oxmysql:execute([[CREATE TABLE IF NOT EXISTS `ghost_shop_wallet` (
         `identifier` VARCHAR(64) NOT NULL,
@@ -31,6 +178,19 @@ CreateThread(function()
             print('[Ghost Market] Tabela ghost_shop_wallet została zweryfikowana.')
         else
             print('[Ghost Market] Nie udało się utworzyć/zweryfikować tabeli ghost_shop_wallet. Sprawdź konfigurację bazy danych')
+        end
+    end)
+
+    exports.oxmysql:execute([[CREATE TABLE IF NOT EXISTS `ghost_shop_state` (
+        `event_key` VARCHAR(64) NOT NULL,
+        `end_at` BIGINT NULL,
+        PRIMARY KEY (`event_key`)
+    )]], {}, function(result)
+        if result ~= nil then
+            print('[Ghost Market] Tabela ghost_shop_state została zweryfikowana.')
+            loadHeroCountdown()
+        else
+            print('[Ghost Market] Nie udało się utworzyć/zweryfikować tabeli ghost_shop_state. Sprawdź konfigurację bazy danych.')
         end
     end)
 end)
@@ -280,16 +440,21 @@ exports('DistributeReward', function(playerSource, rewardData)
     return distributeReward(playerSource, rewardData)
 end)
 
-local function checkAdminPermission(src)
+local function checkAdminPermission(src, overrideAce)
     if src == 0 then
         return true
     end
 
-    if not Config.Admin or not Config.Admin.requiredAce then
+    local ace = overrideAce
+    if not ace or ace == '' then
+        ace = Config.Admin and Config.Admin.requiredAce or nil
+    end
+
+    if not ace or ace == '' then
         return true
     end
 
-    return IsPlayerAceAllowed(src, Config.Admin.requiredAce)
+    return IsPlayerAceAllowed(src, ace)
 end
 
 local function resolveIdentifierFromArg(arg, invoker)
@@ -399,6 +564,68 @@ if adminCommand and adminCommand ~= '' then
     end, true)
 end
 
+local eventTimerConfig = Config.EventTimer or {}
+local eventCommand = eventTimerConfig.command
+if eventCommand and eventCommand ~= '' then
+    RegisterCommand(eventCommand, function(source, args)
+        if not checkAdminPermission(source, eventTimerConfig.requiredAce) then
+            adminFeedback('Odmowa dostepu do polecenia licznika wydarzenia.')
+            return
+        end
+
+        local action = (args[1] or ''):lower()
+
+        if action == 'set' then
+            local durationArgs = {}
+            for i = 2, #args do
+                durationArgs[#durationArgs + 1] = args[i]
+            end
+
+            local seconds = parseDurationToSeconds(durationArgs)
+            if not seconds then
+                adminFeedback('Podaj czas w formacie np. 2h30m, 90 (minuty) lub 01:30:00.')
+                return
+            end
+
+            local targetEnd = currentUnixMillis() + (seconds * 1000)
+
+            exports.oxmysql:execute('INSERT INTO ghost_shop_state (event_key, end_at) VALUES (?, ?) ON DUPLICATE KEY UPDATE end_at = VALUES(end_at)', {HERO_EVENT_KEY, targetEnd}, function(result)
+                if result ~= nil then
+                    heroCountdownEndAt = targetEnd
+                    adminFeedback(('Ustawiono licznik wydarzenia na %s (koniec: %s).'):format(formatDurationFromSeconds(seconds), os.date('%Y-%m-%d %H:%M:%S', targetEnd / 1000)))
+                    sendEventState()
+                else
+                    adminFeedback('Nie udało się zapisać licznika wydarzenia w bazie danych.')
+                end
+            end)
+        elseif action == 'clear' then
+            exports.oxmysql:execute('DELETE FROM ghost_shop_state WHERE event_key = ?', {HERO_EVENT_KEY}, function(result)
+                if result ~= nil then
+                    heroCountdownEndAt = nil
+                    adminFeedback('Wyczyszczono licznik wydarzenia.')
+                    sendEventState()
+                else
+                    adminFeedback('Nie udało się wyczyścić licznika wydarzenia w bazie danych.')
+                end
+            end)
+        elseif action == 'show' then
+            if heroCountdownEndAt then
+                local remainingMs = heroCountdownEndAt - currentUnixMillis()
+                if remainingMs > 0 then
+                    local secondsRemaining = math.floor(remainingMs / 1000)
+                    adminFeedback(('Licznik wygasa za %s (o %s).'):format(formatDurationFromSeconds(secondsRemaining), os.date('%Y-%m-%d %H:%M:%S', heroCountdownEndAt / 1000)))
+                else
+                    adminFeedback(('Licznik wygasł o %s.'):format(os.date('%Y-%m-%d %H:%M:%S', heroCountdownEndAt / 1000)))
+                end
+            else
+                adminFeedback('Brak aktywnego licznika wydarzenia.')
+            end
+        else
+            adminFeedback(('Użycie: /%s <set|clear|show> [czas]'):format(eventCommand))
+        end
+    end, true)
+end
+
 RegisterNetEvent('ghostmarket:requestWallet', function()
     local src = source
     if not ESX then return end
@@ -412,6 +639,11 @@ RegisterNetEvent('ghostmarket:requestWallet', function()
     getCoins(identifier, function(balance)
         TriggerClientEvent('ghostmarket:updateWallet', src, balance)
     end)
+end)
+
+RegisterNetEvent('ghostmarket:requestEventState', function()
+    local src = source
+    sendEventState(src)
 end)
 
 RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
