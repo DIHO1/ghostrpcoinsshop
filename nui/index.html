@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghost Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app" class="hidden">
+        <header class="top-bar">
+            <div class="branding">
+                <span class="logo">GHOST MARKET</span>
+                <span class="tagline">/digital.supremacy</span>
+            </div>
+            <div class="wallet" id="walletDisplay">
+                <span class="wallet-label">Saldo:</span>
+                <span class="wallet-value" id="walletValue">0</span>
+            </div>
+        </header>
+        <main class="content">
+            <section class="items" id="itemsContainer"></section>
+        </main>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">Potwierdzenie zakupu</h2>
+            <p id="modalDescription">Czy na pewno kupić?</p>
+            <div class="modal-actions">
+                <button class="btn ghost" id="confirmPurchase">Kup</button>
+                <button class="btn outline" id="cancelPurchase">Anuluj</button>
+            </div>
+            <p class="modal-feedback" id="modalFeedback"></p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
