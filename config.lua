@@ -23,6 +23,59 @@ Config.AntiSpam = {
     cooldown = 5000 -- milliseconds
 }
 
+Config.Layout = {
+    hero = {
+        badge = 'Nowe skrzynki eventowe',
+        title = 'Nowe skrzynki eventowe - ograniczone czasowo!',
+        subtitle = 'Sprawdź, które pakiety znikną z oferty Ghost Market jeszcze w tym tygodniu.',
+        countdown = 'Koniec za: 04d 10h 05m',
+        primaryCTA = { label = 'Sprawdź skrzynki', target = 'event_crates' },
+        secondaryCTA = { label = 'Kup pojazd', target = 'vehicles' },
+        featuredItems = {
+            'prototype_crate',
+            'vehicle_crate',
+            'limited_crate'
+        }
+    },
+    sections = {
+        {
+            id = 'event_crates',
+            title = 'Skrzynki Eventowe',
+            subtitle = 'Limitowane skrzynki przygotowane specjalnie na aktualne wydarzenie.',
+            filter = { category = 'event' },
+            variant = 'highlight'
+        },
+        {
+            id = 'vehicles',
+            title = 'Pojazdy do kupna',
+            subtitle = 'Zakup pojazd i przekaż go do swojego garażu z pomocą integracji serwera.',
+            filter = { category = 'vehicles' },
+            variant = 'feature'
+        },
+        {
+            id = 'crates',
+            title = 'Skrzynki',
+            subtitle = 'Stała rotacja skrzynek Ghost Market z różnymi nagrodami.',
+            filter = { rewardType = 'crate' },
+            variant = 'grid'
+        },
+        {
+            id = 'boosts',
+            title = 'Pakiety i zasoby',
+            subtitle = 'Natychmiastowe wzmocnienia, zapasy oraz premie gotówkowe.',
+            filter = { category = 'boosts' },
+            variant = 'grid'
+        },
+        {
+            id = 'services',
+            title = 'Usługi premium',
+            subtitle = 'Odblokuj dostęp do wyjątkowych rang i dodatkowych przywilejów.',
+            filter = { category = 'services' },
+            variant = 'list'
+        }
+    }
+}
+
 -- Shop item definitions
 Config.ShopItems = {
     {
@@ -31,6 +84,7 @@ Config.ShopItems = {
         price = 25,
         icon = '🧬',
         description = 'Zaawansowany pakiet medyczny regenerujący zdrowie natychmiastowo.',
+        category = 'boosts',
         rewardData = {
             type = 'item',
             item = 'medikit',
@@ -43,6 +97,7 @@ Config.ShopItems = {
         price = 40,
         icon = '💼',
         description = 'Natychmiastowy zastrzyk czystej gotówki od konsorcjum Ghost.',
+        category = 'boosts',
         rewardData = {
             type = 'money',
             account = 'money',
@@ -55,6 +110,7 @@ Config.ShopItems = {
         price = 55,
         icon = '🕶️',
         description = 'Płatność w brudnej gotówce dla działań w cieniu.',
+        category = 'boosts',
         rewardData = {
             type = 'money',
             account = 'black_money',
@@ -67,6 +123,7 @@ Config.ShopItems = {
         price = 75,
         icon = '👑',
         description = 'Natychmiastowy awans do elitarnej grupy administracyjnej.',
+        category = 'services',
         rewardData = {
             type = 'group',
             group = 'ghost.overseer'
@@ -78,6 +135,7 @@ Config.ShopItems = {
         price = 120,
         icon = '🚗',
         description = 'Limitowany pojazd klasy prototyp. Wymaga integracji z systemem garażu.',
+        category = 'vehicles',
         rewardData = {
             type = 'vehicle',
             model = 'specter',
@@ -94,6 +152,7 @@ Config.ShopItems = {
         price = 185,
         icon = '🧪',
         description = 'Eksperymentalne komponenty i konceptowe pojazdy z laboratorium Ghost.',
+        category = 'event',
         rewardData = {
             type = 'crate',
             crateLabel = 'Skrzynia Prototypów',
@@ -185,6 +244,7 @@ Config.ShopItems = {
         price = 145,
         icon = '🚙',
         description = 'Pakiet pojazdów drogowych i luksusowych dodatków do garażu.',
+        category = 'crates',
         rewardData = {
             type = 'crate',
             crateLabel = 'Skrzynia Aut',
@@ -262,6 +322,7 @@ Config.ShopItems = {
         price = 95,
         icon = '🔫',
         description = 'Selektor krótkiej broni palnej z bonusowym wyposażeniem.',
+        category = 'crates',
         rewardData = {
             type = 'crate',
             crateLabel = 'Skrzynka Arsenału',
@@ -336,6 +397,7 @@ Config.ShopItems = {
         price = 210,
         icon = '🎁',
         description = 'Ekskluzywne nagrody limitowane czasowo i kolekcjonerskie.',
+        category = 'event',
         rewardData = {
             type = 'crate',
             crateLabel = 'Skrzynia Limitek',

@@ -6,76 +6,52 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="app" class="hidden">
-        <div class="tablet-shell">
-            <span class="tablet-camera"></span>
-            <header class="top-bar">
-                <div class="branding">
-                    <span class="logo">GHOST MARKET</span>
-                    <span class="tagline">/digital.supremacy</span>
-                </div>
-                <div class="wallet" id="walletDisplay">
-                    <span class="wallet-label">Saldo:</span>
-                    <span class="wallet-value" id="walletValue">0</span>
-                </div>
-            </header>
+    <div class="background-filter"></div>
+    <div id="app" class="market hidden">
+        <header class="market-header">
+            <div class="brand">
+                <span class="brand-logo">Ghost Market</span>
+                <span class="brand-badge">// ver.2028</span>
+            </div>
+            <div class="wallet" id="walletDisplay">
+                <span class="wallet-label">Saldo</span>
+                <span class="wallet-value" id="walletValue">💎 0</span>
+            </div>
+        </header>
 
-            <nav class="magic-nav" id="viewNav">
-                <button class="nav-item active" data-view="overview" data-index="0">
-                    <span class="nav-icon">🏠</span>
-                    <span class="nav-text">Panel</span>
-                </button>
-                <button class="nav-item" data-view="shop" data-index="1">
-                    <span class="nav-icon">🛒</span>
-                    <span class="nav-text">Sklep</span>
-                </button>
-                <button class="nav-item" data-view="intel" data-index="2">
-                    <span class="nav-icon">🧠</span>
-                    <span class="nav-text">Intel</span>
-                </button>
-                <button class="nav-item" data-view="log" data-index="3">
-                    <span class="nav-icon">📡</span>
-                    <span class="nav-text">Aktywność</span>
-                </button>
-                <span class="nav-glow" id="navGlow"></span>
-            </nav>
+        <section class="hero">
+            <div class="hero-copy">
+                <span class="hero-badge" id="heroBadge">Nowość</span>
+                <h1 class="hero-title" id="heroTitle">Ghost Market</h1>
+                <p class="hero-subtitle" id="heroSubtitle">Ekskluzywny sklep premium dla społeczności Ghost.</p>
+                <div class="hero-meta">
+                    <span class="hero-countdown" id="heroCountdown">Koniec za: --</span>
+                </div>
+                <div class="hero-actions">
+                    <button class="btn ghost" id="heroPrimary">Sprawdź skrzynki</button>
+                    <button class="btn outline" id="heroSecondary">Kup pojazd</button>
+                </div>
+            </div>
+            <div class="hero-featured" id="heroFeatured"></div>
+        </section>
 
-            <main class="content">
-                <section class="view-panel active" data-view="overview">
-                    <h2>Witamy w Ghost Market</h2>
-                    <p class="view-description">Wykorzystaj swoje 💎 Ghost Coins do natychmiastowej dystrybucji nagród klasy premium.</p>
-                    <div class="intel-grid">
-                        <article class="intel-card">
-                            <h3>Jak kupować?</h3>
-                            <p>Wybierz zakładkę <strong>Sklep</strong>, kliknij produkt i potwierdź zakup w nowym oknie potwierdzenia.</p>
-                        </article>
-                        <article class="intel-card">
-                            <h3>Zarządzanie saldem</h3>
-                            <p>Administratorzy mogą używać polecenia <code>/ghostcoins</code>, aby dodawać, usuwać lub ustawiać saldo portfela.</p>
-                        </article>
-                        <article class="intel-card">
-                            <h3>Bezpieczeństwo</h3>
-                            <p>System chroni przed spamem zakupów i loguje każdą transakcję w konsoli serwera.</p>
-                        </article>
-                    </div>
-                </section>
-                <section class="view-panel" data-view="shop">
-                    <section class="items" id="itemsContainer"></section>
-                </section>
-                <section class="view-panel" data-view="intel">
-                    <div class="intel-feed">
-                        <p>Ghost Market synchronizuje saldo przy każdym otwarciu interfejsu oraz po każdej transakcji.</p>
-                        <p>Upewnij się, że integracja pojazdów kieruje zakupione modele do Twojego systemu garażowego.</p>
-                        <p>Dodatkowe moduły mogą nasłuchiwać zdarzenia <code>ghostmarket:purchaseResult</code> po stronie klienta.</p>
-                    </div>
-                </section>
-                <section class="view-panel" data-view="log">
-                    <div class="activity-log" id="activityLog">
-                        <p class="placeholder">Brak ostatnich zakupów. Dokonaj transakcji, aby pojawiły się wpisy.</p>
-                    </div>
-                </section>
-            </main>
-        </div>
+        <main class="market-content" id="contentScroll">
+            <div class="sections" id="sectionsRoot"></div>
+
+            <section class="catalog-section activity" data-section="activity">
+                <header>
+                    <h2>Aktywność</h2>
+                    <p class="section-subtitle">Rejestr ostatnich zakupów i nagród Ghost Market.</p>
+                </header>
+                <div class="activity-log" id="activityLog">
+                    <p class="placeholder">Brak ostatnich zakupów. Dokonaj transakcji, aby pojawiły się wpisy.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="market-footer">
+            <span>© 2028 Ghost Market. Wszystkie prawa zastrzeżone.</span>
+        </footer>
     </div>
 
     <div id="modal" class="modal hidden">

@@ -21,7 +21,8 @@ local function openMarket()
     SendNUIMessage({
         action = 'open',
         items = Config.ShopItems,
-        currency = Config.Currency
+        currency = Config.Currency,
+        layout = Config.Layout
     })
 
     TriggerServerEvent('ghostmarket:requestWallet')
