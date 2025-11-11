@@ -403,6 +403,37 @@ local function selectCrateEntry(pool)
     return pool[#pool]
 end
 
+local function sanitizeCrateEntry(entry)
+    if type(entry) ~= 'table' then
+        return nil
+    end
+
+    return {
+        id = entry.id,
+        label = entry.label,
+        icon = entry.icon,
+        rarity = entry.rarity,
+        prop = entry.prop
+    }
+end
+
+local function sanitizeCratePool(pool)
+    local sanitized = {}
+
+    if type(pool) ~= 'table' then
+        return sanitized
+    end
+
+    for index, entry in ipairs(pool) do
+        local cleaned = sanitizeCrateEntry(entry)
+        if cleaned then
+            sanitized[index] = cleaned
+        end
+    end
+
+    return sanitized
+end
+
 local function processReward(xPlayer, rewardData)
     if not rewardData or not rewardData.type then
         return false, 'invalid_reward'
@@ -421,6 +452,8 @@ local function processReward(xPlayer, rewardData)
             return false, nestedInfo or 'crate_failed'
         end
 
+        local sanitizedPool = sanitizeCratePool(pool)
+
         local crateInfo = {
             type = 'crate',
             crateLabel = rewardData.crateLabel or rewardData.label or 'Skrzynia',
@@ -431,10 +464,11 @@ local function processReward(xPlayer, rewardData)
                 label = selectedEntry.label,
                 icon = selectedEntry.icon,
                 rarity = selectedEntry.rarity,
+                prop = selectedEntry.prop,
                 rewardType = nestedInfo and nestedInfo.rewardType or (selectedEntry.reward and selectedEntry.reward.type),
                 rewardDetails = nestedInfo
             },
-            poolPreview = pool
+            poolPreview = sanitizedPool
         }
 
         return true, crateInfo

@@ -41,6 +41,8 @@ const crateTitle = document.getElementById('crateTitle');
 const crateTrack = document.getElementById('crateTrack');
 const crateReel = document.getElementById('crateReel');
 const crateSummary = document.getElementById('crateSummary');
+const crateRewardProp = document.getElementById('crateRewardProp');
+const cratePropIcon = document.getElementById('cratePropIcon');
 const crateRewardIcon = document.getElementById('crateRewardIcon');
 const crateRewardLabel = document.getElementById('crateRewardLabel');
 const crateRewardRarity = document.getElementById('crateRewardRarity');
@@ -63,6 +65,69 @@ function formatTypeLabel(type) {
         crate: 'Skrzynka'
     };
     return labels[type] || type || '';
+}
+
+function withAlpha(hex, alpha) {
+    if (typeof hex !== 'string' || !hex.startsWith('#')) {
+        return '';
+    }
+
+    let normalized = hex;
+    if (hex.length === 4) {
+        const r = hex[1];
+        const g = hex[2];
+        const b = hex[3];
+        normalized = `#${r}${r}${g}${g}${b}${b}`;
+    }
+
+    if (normalized.length !== 7) {
+        return '';
+    }
+
+    return `${normalized}${alpha}`;
+}
+
+function normalizeRarity(value) {
+    return typeof value === 'string' ? value.toLowerCase() : '';
+}
+
+function formatRarityLabel(value) {
+    const normalized = normalizeRarity(value);
+    if (!normalized) {
+        return '';
+    }
+
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function applyPropVisual(container, iconElement, prop, fallbackIcon, fallbackAccent) {
+    const accent = (prop && typeof prop.color === 'string' && prop.color) || fallbackAccent || '#62f6ff';
+
+    if (iconElement) {
+        iconElement.textContent = (prop && prop.icon) || fallbackIcon || '🎁';
+    }
+
+    if (!container) {
+        return accent;
+    }
+
+    if (prop && prop.image) {
+        container.style.backgroundImage = `url(${prop.image})`;
+        container.style.backgroundSize = 'cover';
+        container.style.backgroundPosition = 'center';
+    } else {
+        container.style.backgroundImage = '';
+    }
+
+    const background = prop && prop.background
+        ? prop.background
+        : `linear-gradient(150deg, ${withAlpha(accent, '33') || `${accent}33`}, rgba(12, 26, 60, 0.85))`;
+
+    container.style.background = background;
+    container.style.boxShadow = `0 26px 70px ${withAlpha(accent, '33') || `${accent}33`}`;
+    container.style.borderColor = withAlpha(accent, '55') || accent;
+
+    return accent;
 }
 
 function setWallet(amount) {
@@ -561,10 +626,23 @@ function resetCrateOverlay() {
     }
 
     crateOverlay.classList.add('hidden');
-    crateSummary.classList.remove('visible');
-    crateSummary.style.boxShadow = '';
-    crateSummary.style.borderColor = '';
-    crateRewardRarity.style.color = '';
+    if (crateSummary) {
+        crateSummary.classList.remove('visible');
+        crateSummary.style.boxShadow = '';
+        crateSummary.style.borderColor = '';
+    }
+    if (crateRewardRarity) {
+        crateRewardRarity.style.color = '';
+    }
+    if (crateRewardProp) {
+        crateRewardProp.style.background = '';
+        crateRewardProp.style.borderColor = '';
+        crateRewardProp.style.boxShadow = '';
+        crateRewardProp.style.backgroundImage = '';
+    }
+    if (cratePropIcon) {
+        cratePropIcon.textContent = '🎁';
+    }
     crateTrack.innerHTML = '';
 }
 
@@ -577,13 +655,14 @@ function closeCrateOverlay() {
     }
 }
 
-function buildCrateCards(pool, selection) {
+function buildCrateCards(pool, selection, highlight) {
     const sanitizedPool = Array.isArray(pool) && pool.length > 0
         ? pool.map((entry) => ({
             id: entry.id,
             label: entry.label || 'Nagroda',
             icon: entry.icon || '🎁',
-            rarity: (entry.rarity || 'pospolity').toLowerCase()
+            rarity: normalizeRarity(entry.rarity || 'pospolity'),
+            prop: entry.prop
         }))
         : [];
 
@@ -592,7 +671,8 @@ function buildCrateCards(pool, selection) {
             id: selection.id,
             label: selection.label || 'Nagroda',
             icon: selection.icon || '🎁',
-            rarity: (selection.rarity || 'pospolity').toLowerCase()
+            rarity: normalizeRarity(selection.rarity || 'pospolity'),
+            prop: selection.prop
         }
     ];
 
@@ -610,8 +690,10 @@ function buildCrateCards(pool, selection) {
         id: selection.id,
         label: selection.label || 'Nagroda',
         icon: selection.icon || '🎁',
-        rarity: (selection.rarity || 'pospolity').toLowerCase(),
-        winning: true
+        rarity: normalizeRarity(selection.rarity || 'pospolity'),
+        prop: selection.prop,
+        winning: true,
+        highlight
     });
 
     for (let i = 0; i < 6; i += 1) {
@@ -628,36 +710,82 @@ function playCrateAnimation(item, context) {
 
     crateOverlay.classList.remove('hidden');
     crateTitle.textContent = context.crateLabel || item.label || 'Skrzynia';
-    crateSummary.classList.remove('visible');
+    if (crateSummary) {
+        crateSummary.classList.remove('visible');
+    }
 
     const highlight = context.highlight || '#62f6ff';
-    crateSummary.style.borderColor = highlight;
-    crateSummary.style.boxShadow = `0 0 32px ${highlight}55`;
-    crateRewardRarity.style.color = highlight;
-
     const selection = context.selection || {};
-    crateRewardIcon.textContent = selection.icon || item.icon || '🎁';
+    const summaryAccent = applyPropVisual(
+        crateRewardProp,
+        cratePropIcon,
+        selection.prop,
+        selection.icon || item.icon,
+        highlight
+    );
+
+    const activeAccent = summaryAccent || highlight;
+    const borderColor = withAlpha(activeAccent, '55') || activeAccent;
+    const glowColor = withAlpha(activeAccent, '33') || activeAccent;
+
     crateRewardLabel.textContent = selection.label || 'Nagroda';
-    crateRewardRarity.textContent = selection.rarity || 'tajemnicza';
+    if (crateRewardRarity) {
+        crateRewardRarity.textContent = formatRarityLabel(selection.rarity) || 'Tajemnicza';
+        crateRewardRarity.style.color = activeAccent;
+    }
+
+    if (crateSummary) {
+        crateSummary.style.borderColor = borderColor;
+        crateSummary.style.boxShadow = `0 26px 70px ${glowColor}`;
+    }
 
     crateTrack.innerHTML = '';
-    const cards = buildCrateCards(context.poolPreview, selection);
+    const cards = buildCrateCards(context.poolPreview, selection, activeAccent);
 
     cards.forEach((card) => {
         const element = document.createElement('div');
         element.className = 'crate-card';
-        element.dataset.rarity = card.rarity;
 
-        const icon = document.createElement('span');
-        icon.className = 'icon';
-        icon.textContent = card.icon || '🎁';
+        const rarityValue = normalizeRarity(card.rarity);
+        if (rarityValue) {
+            element.dataset.rarity = rarityValue;
+        }
+
+        const propContainer = document.createElement('div');
+        propContainer.className = 'prop';
+        const propIcon = document.createElement('span');
+        propIcon.className = 'prop-icon';
+        propContainer.appendChild(propIcon);
+
+        const info = document.createElement('div');
+        info.className = 'info';
 
         const label = document.createElement('span');
         label.className = 'label';
-        label.textContent = card.label;
+        label.textContent = card.label || 'Nagroda';
 
-        element.appendChild(icon);
-        element.appendChild(label);
+        const rarityLabel = document.createElement('span');
+        rarityLabel.className = 'rarity';
+        rarityLabel.textContent = formatRarityLabel(card.rarity) || '';
+
+        info.appendChild(label);
+        info.appendChild(rarityLabel);
+
+        const accent = applyPropVisual(propContainer, propIcon, card.prop, card.icon, activeAccent);
+        if (accent) {
+            const cardBorder = withAlpha(accent, '44') || accent;
+            const cardGlow = withAlpha(accent, '2a') || accent;
+            if (cardBorder) {
+                element.style.borderColor = cardBorder;
+            }
+            if (cardGlow) {
+                element.style.boxShadow = `0 24px 70px ${cardGlow}`;
+            }
+        }
+
+        element.appendChild(propContainer);
+        element.appendChild(info);
+
         if (card.winning) {
             element.dataset.winning = 'true';
         }
@@ -669,7 +797,9 @@ function playCrateAnimation(item, context) {
         const winningElement = crateTrack.querySelector('[data-winning="true"]');
         const cardElement = crateTrack.querySelector('.crate-card');
         if (!winningElement || !cardElement) {
-            crateSummary.classList.add('visible');
+            if (crateSummary) {
+                crateSummary.classList.add('visible');
+            }
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
             return;
         }
@@ -697,7 +827,9 @@ function playCrateAnimation(item, context) {
 
         state.crateAnimation.onfinish = () => {
             winningElement.classList.add('winning');
-            crateSummary.classList.add('visible');
+            if (crateSummary) {
+                crateSummary.classList.add('visible');
+            }
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
             state.crateAnimation = null;
         };
