@@ -195,6 +195,42 @@ CreateThread(function()
     end)
 end)
 
+local printedAceHints = {}
+
+local function printAceHint(context, ace)
+    if not ace or ace == '' then
+        return
+    end
+
+    if printedAceHints[ace] then
+        return
+    end
+
+    printedAceHints[ace] = true
+
+    print(('[Ghost Market] Uprawnienia ACE dla %s wymagają flagi "%s".'):format(context, ace))
+    print(('[Ghost Market]   add_ace group.admin %s allow    # przykład nadania dostępu grupie'):format(ace))
+    print('[Ghost Market]   add_principal identifier.steam:110000112345678 group.admin    # powiąż konkretnego gracza z grupą')
+    print('[Ghost Market]   # możesz też użyć add_ace identifier.<typ>:<id> ' .. ace .. ' allow, aby nadać dostęp pojedynczej osobie')
+end
+
+AddEventHandler('onResourceStart', function(resourceName)
+    if resourceName ~= GetCurrentResourceName() then
+        return
+    end
+
+    local adminConfig = Config.Admin or {}
+    if adminConfig.command and adminConfig.command ~= '' then
+        printAceHint(('/%s'):format(adminConfig.command), adminConfig.requiredAce)
+    end
+
+    local eventConfig = Config.EventTimer or {}
+    if eventConfig.command and eventConfig.command ~= '' then
+        local ace = eventConfig.requiredAce or adminConfig.requiredAce
+        printAceHint(('/%s'):format(eventConfig.command), ace)
+    end
+end)
+
 local function getPlayerIdentifier(xPlayer)
     return xPlayer and xPlayer.identifier
 end
