@@ -10,7 +10,8 @@ const state = {
     heroCountdownConfig: null,
     heroCountdownRuntime: null,
     heroCountdownResolved: null,
-    heroCountdownTimer: null
+    heroCountdownTimer: null,
+    statusClockTimer: null
 };
 
 const app = document.getElementById('app');
@@ -30,6 +31,11 @@ const heroCountdown = document.getElementById('heroCountdown');
 const heroPrimary = document.getElementById('heroPrimary');
 const heroSecondary = document.getElementById('heroSecondary');
 const heroFeatured = document.getElementById('heroFeatured');
+const heroSection = document.getElementById('heroSection');
+const contentScroll = document.getElementById('contentScroll');
+const walletDisplay = document.getElementById('walletDisplay');
+const statusClock = document.getElementById('statusClock');
+const navLinks = Array.from(document.querySelectorAll('.nav-link'));
 const crateOverlay = document.getElementById('crateOverlay');
 const crateTitle = document.getElementById('crateTitle');
 const crateTrack = document.getElementById('crateTrack');
@@ -252,8 +258,6 @@ function updateHeroCountdownLabel(label, fallback, endAt) {
 }
 
 function refreshHeroCountdown() {
-    clearHeroCountdownTimer();
-
     const config = state.heroCountdownConfig;
     const runtime = state.heroCountdownRuntime;
 
@@ -284,16 +288,16 @@ function refreshHeroCountdown() {
 
     state.heroCountdownResolved = { label, fallback, endAt };
 
-    const completed = updateHeroCountdownLabel(label, fallback, endAt);
+    updateHeroCountdownLabel(label, fallback, endAt);
+}
 
-    if (endAt && !completed) {
-        state.heroCountdownTimer = setInterval(() => {
-            const done = updateHeroCountdownLabel(label, fallback, endAt);
-            if (done) {
-                clearHeroCountdownTimer();
-            }
-        }, 1000);
+function tickHeroCountdown() {
+    if (!state.heroCountdownResolved) {
+        return;
     }
+
+    const { label, fallback, endAt } = state.heroCountdownResolved;
+    updateHeroCountdownLabel(label, fallback, endAt);
 }
 
 function normalizeRuntimeCountdown(runtime) {
@@ -700,25 +704,188 @@ function playCrateAnimation(item, context) {
     });
 }
 
-function scrollToSection(target) {
-    if (!target) {
+let navResetTimer = null;
+
+function clearNavResetTimer() {
+    if (navResetTimer) {
+        clearTimeout(navResetTimer);
+        navResetTimer = null;
+    }
+}
+
+function updateStatusClock() {
+    if (!statusClock) {
         return;
     }
-    const section = document.querySelector(`[data-section="${target}"]`);
+
+    const now = new Date();
+    statusClock.textContent = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+}
+
+function startStatusClock() {
+    if (!statusClock) {
+        return;
+    }
+
+    updateStatusClock();
+    if (state.statusClockTimer) {
+        clearInterval(state.statusClockTimer);
+    }
+    state.statusClockTimer = setInterval(updateStatusClock, 1000);
+}
+
+function stopStatusClock() {
+    if (state.statusClockTimer) {
+        clearInterval(state.statusClockTimer);
+        state.statusClockTimer = null;
+    }
+}
+
+function focusWallet() {
+    if (!walletDisplay) {
+        return;
+    }
+
+    walletDisplay.classList.add('pulse');
+    setTimeout(() => {
+        walletDisplay.classList.remove('pulse');
+    }, 1600);
+}
+
+function setActiveNav(target) {
+    navLinks.forEach((link) => {
+        const linkTarget = link.dataset.target || '';
+        if (linkTarget === target) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+}
+
+function updateNavForPosition() {
+    if (!contentScroll) {
+        return;
+    }
+
+    const scrollTop = contentScroll.scrollTop || 0;
+    const activity = document.querySelector('[data-section="activity"]');
+
+    if (activity) {
+        const threshold = Math.max(activity.offsetTop - 120, 0);
+        if (scrollTop >= threshold) {
+            setActiveNav('activity');
+            return;
+        }
+    }
+
+    if (scrollTop > 40) {
+        setActiveNav('sections');
+    } else {
+        setActiveNav('hero');
+    }
+}
+
+function scrollToSection(target) {
+    if (!target) {
+        return null;
+    }
+
+    if (target === 'hero') {
+        if (heroSection && heroSection.scrollIntoView) {
+            heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return heroSection;
+    }
+
+    if (target === 'wallet') {
+        if (heroSection && heroSection.scrollIntoView) {
+            heroSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        focusWallet();
+        return walletDisplay;
+    }
+
+    if (!contentScroll) {
+        const fallbackSection = document.querySelector(`[data-section="${target}"]`);
+        if (fallbackSection && fallbackSection.scrollIntoView) {
+            fallbackSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return fallbackSection;
+    }
+
+    if (target === 'sections') {
+        contentScroll.scrollTo({ top: 0, behavior: 'smooth' });
+        return sectionsRoot;
+    }
+
+    const section = target === 'activity'
+        ? document.querySelector('[data-section="activity"]')
+        : document.querySelector(`[data-section="${target}"]`);
+
+    if (section && contentScroll.contains(section)) {
+        const offset = section.offsetTop;
+        contentScroll.scrollTo({ top: offset, behavior: 'smooth' });
+        return section;
+    }
+
     if (section && section.scrollIntoView) {
         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    return section;
+}
+
+if (contentScroll) {
+    contentScroll.addEventListener('scroll', () => {
+        if (navResetTimer) {
+            return;
+        }
+        updateNavForPosition();
+    });
+}
+
+if (navLinks.length > 0) {
+    navLinks.forEach((link) => {
+        link.addEventListener('click', () => {
+            const target = link.dataset.target || '';
+            setActiveNav(target || 'hero');
+            scrollToSection(target);
+
+            clearNavResetTimer();
+
+            if (target === 'wallet') {
+                navResetTimer = setTimeout(() => {
+                    clearNavResetTimer();
+                    updateNavForPosition();
+                }, 2200);
+            } else if (target !== 'hero') {
+                navResetTimer = setTimeout(() => {
+                    clearNavResetTimer();
+                    updateNavForPosition();
+                }, 900);
+            }
+        });
+    });
 }
 
 if (heroPrimary) {
     heroPrimary.addEventListener('click', () => {
-        scrollToSection(heroPrimary.dataset.target);
+        const target = heroPrimary.dataset.target || '';
+        if (target) {
+            setActiveNav(target);
+        }
+        scrollToSection(target);
     });
 }
 
 if (heroSecondary) {
     heroSecondary.addEventListener('click', () => {
-        scrollToSection(heroSecondary.dataset.target);
+        const target = heroSecondary.dataset.target || '';
+        if (target) {
+            setActiveNav(target);
+        }
+        scrollToSection(target);
     });
 }
 
@@ -783,8 +950,12 @@ window.addEventListener('message', (event) => {
             app.classList.remove('hidden');
         }
 
+        startStatusClock();
+        clearNavResetTimer();
+        setActiveNav('hero');
         applyHeroLayout();
         renderSections();
+        updateNavForPosition();
         if (data.eventState) {
             applyEventState(data.eventState);
         }
@@ -802,6 +973,9 @@ window.addEventListener('message', (event) => {
             app.classList.add('hidden');
         }
         document.body.classList.remove('market-active');
+        stopStatusClock();
+        clearNavResetTimer();
+        setActiveNav('hero');
         closeModal();
         resetCrateOverlay();
         clearHeroCountdownTimer();
@@ -810,6 +984,11 @@ window.addEventListener('message', (event) => {
 
     if (action === 'updateEventState') {
         applyEventState(data.state || data);
+        return;
+    }
+
+    if (action === 'tickCountdown') {
+        tickHeroCountdown();
         return;
     }
 

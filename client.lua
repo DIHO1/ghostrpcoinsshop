@@ -5,6 +5,33 @@ local hasFocus = false
 local currentBalance = 0
 local currentEventState = {}
 
+local function hasHeroCountdown()
+    if type(currentEventState) ~= 'table' then
+        return false
+    end
+
+    local countdown = currentEventState.heroCountdown
+    if type(countdown) ~= 'table' then
+        return false
+    end
+
+    return true
+end
+
+local function sendCountdownTick()
+    if not isOpen then
+        return
+    end
+
+    if not hasHeroCountdown() then
+        return
+    end
+
+    SendNUIMessage({
+        action = 'tickCountdown'
+    })
+end
+
 local function toggleFocus(state)
     hasFocus = state
     SetNuiFocus(state, state)
@@ -45,6 +72,7 @@ local function openMarket()
     TriggerServerEvent('ghostmarket:requestWallet')
     TriggerServerEvent('ghostmarket:requestEventState')
     sendEventStateToNui()
+    sendCountdownTick()
 end
 
 local function closeMarket()
@@ -100,6 +128,7 @@ RegisterNetEvent('ghostmarket:updateEventState', function(state)
     end
 
     sendEventStateToNui()
+    sendCountdownTick()
 end)
 
 RegisterNetEvent('ghostmarket:purchaseResult', function(result)
@@ -124,6 +153,17 @@ CreateThread(function()
             DisableControlAction(0, 24, true)
             DisableControlAction(0, 25, true)
             Wait(0)
+        else
+            Wait(1000)
+        end
+    end
+end)
+
+CreateThread(function()
+    while true do
+        if isOpen and hasHeroCountdown() then
+            sendCountdownTick()
+            Wait(1000)
         else
             Wait(1000)
         end
