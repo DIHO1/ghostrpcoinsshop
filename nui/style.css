@@ -331,6 +331,10 @@ body.market-active .background-filter {
     border: 1px solid rgba(120, 185, 255, 0.28);
 }
 
+.hero-featured .card-preview {
+    min-height: 160px;
+}
+
 .market-sections {
     display: flex;
     flex-direction: column;
@@ -423,14 +427,13 @@ body.market-active .background-filter {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 18px;
-    padding: 26px 28px;
     border-radius: var(--radius-medium);
     background: var(--card-gradient);
     border: 1px solid var(--card-border);
     box-shadow: 0 24px 60px rgba(3, 12, 28, 0.55);
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
 }
 
 .item-card::before {
@@ -466,13 +469,25 @@ body.market-active .background-filter {
     border: 1px solid rgba(255, 255, 255, 0.22);
 }
 
+.item-card--with-preview .card-body {
+    padding: 26px 28px 28px;
+}
+
 .item-card--feature {
-    padding: 32px;
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    align-items: center;
-    gap: 32px;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    align-items: stretch;
     background: linear-gradient(160deg, rgba(11, 34, 78, 0.92), rgba(6, 16, 34, 0.85));
+}
+
+.item-card--feature .card-preview {
+    min-height: 100%;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.item-card--feature .card-body {
+    padding: 36px 34px;
+    gap: 22px;
 }
 
 .item-card--feature .card-description {
@@ -487,7 +502,85 @@ body.market-active .background-filter {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+}
+
+.item-card--list .card-body {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    width: 100%;
     padding: 28px 32px;
+}
+
+.item-card--list .card-description {
+    margin: 0;
+    max-width: 420px;
+}
+
+.item-card--list .card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.item-card--list .card-meta {
+    align-items: flex-start;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding: 26px 28px;
+}
+
+.card-preview {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 28px 30px;
+    min-height: 170px;
+    color: #ffffff;
+    background: linear-gradient(160deg, rgba(18, 36, 78, 0.75), rgba(8, 16, 38, 0.9));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card-preview--vehicle,
+.card-preview--weapon {
+    align-items: flex-start;
+    min-height: 190px;
+    padding: 32px 34px;
+}
+
+.card-preview .preview-icon {
+    font-size: 2.6rem;
+    filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.35));
+}
+
+.card-preview .preview-label {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.card-preview--vehicle .preview-label,
+.card-preview--weapon .preview-label {
+    font-size: 1.45rem;
+}
+
+.card-preview .preview-meta {
+    font-size: 0.82rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.card-preview .preview-tagline {
+    font-size: 0.85rem;
+    opacity: 0.82;
 }
 
 .card-header {
@@ -857,6 +950,11 @@ body.market-active .background-filter {
 .crate-item-label {
     font-size: 1.25rem;
     font-weight: 700;
+}
+
+.crate-item-detail {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .crate-item-rarity {

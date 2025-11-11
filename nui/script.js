@@ -44,6 +44,7 @@ const crateSummary = document.getElementById('crateSummary');
 const crateRewardProp = document.getElementById('crateRewardProp');
 const cratePropIcon = document.getElementById('cratePropIcon');
 const crateRewardLabel = document.getElementById('crateRewardLabel');
+const crateRewardDetail = document.getElementById('crateRewardDetail');
 const crateRewardRarity = document.getElementById('crateRewardRarity');
 const crateContinue = document.getElementById('crateContinue');
 const crateClose = document.getElementById('crateClose');
@@ -97,6 +98,114 @@ function formatRarityLabel(value) {
     }
 
     return normalized.charAt(0).toUpperCase() + normalized.slice(1);
+}
+
+function normalizeVisualType(type) {
+    if (typeof type !== 'string') {
+        return '';
+    }
+
+    const normalized = type.trim().toLowerCase();
+    const allowed = ['vehicle', 'weapon', 'crate', 'boost', 'service'];
+    return allowed.includes(normalized) ? normalized : '';
+}
+
+function buildCardPreview(item) {
+    if (!item) {
+        return { preview: null, accent: null };
+    }
+
+    const visual = item.visual || {};
+    const preview = document.createElement('div');
+    preview.className = 'card-preview';
+
+    const visualType = normalizeVisualType(visual.type);
+    if (visualType) {
+        preview.classList.add(`card-preview--${visualType}`);
+    }
+
+    const accent = visual.accent || (item.rewardData && item.rewardData.highlight) || null;
+    const accentIsHex = typeof accent === 'string' && accent.startsWith('#') && (accent.length === 7 || accent.length === 4);
+    if (accent) {
+        preview.style.setProperty('--preview-accent', accent);
+    }
+
+    if (accentIsHex) {
+        const primary = withAlpha(accent, '33') || `${accent}33`;
+        const border = withAlpha(accent, '44') || `${accent}44`;
+        const outline = withAlpha(accent, '22') || `${accent}22`;
+        preview.style.background = `linear-gradient(160deg, ${primary}, rgba(8, 16, 38, 0.88))`;
+        preview.style.borderBottom = `1px solid ${border}`;
+        preview.style.boxShadow = `inset 0 0 0 1px ${outline}`;
+    } else {
+        preview.style.background = 'linear-gradient(160deg, rgba(18, 36, 78, 0.75), rgba(8, 16, 38, 0.9))';
+    }
+
+    if (visual.image) {
+        preview.style.backgroundImage = `linear-gradient(160deg, rgba(8, 16, 38, 0.2), rgba(8, 16, 38, 0.85)), url(${visual.image})`;
+        preview.style.backgroundSize = 'cover';
+        preview.style.backgroundPosition = 'center';
+    }
+
+    const icon = visual.icon || item.icon || '💎';
+    const heading = visual.name || visual.label || item.label || '';
+    const model = visual.model || visual.code || '';
+    const tagline = visual.tagline || '';
+
+    if (visualType === 'vehicle' || visualType === 'weapon') {
+        const label = document.createElement('span');
+        label.className = 'preview-label';
+        label.textContent = heading;
+        preview.appendChild(label);
+
+        if (model) {
+            const meta = document.createElement('span');
+            meta.className = 'preview-meta';
+            meta.textContent = model.toUpperCase();
+            preview.appendChild(meta);
+        }
+
+        if (tagline) {
+            const tag = document.createElement('span');
+            tag.className = 'preview-tagline';
+            tag.textContent = tagline;
+            preview.appendChild(tag);
+        }
+    } else {
+        const iconElement = document.createElement('span');
+        iconElement.className = 'preview-icon';
+        iconElement.textContent = icon;
+        preview.appendChild(iconElement);
+
+        if (heading) {
+            const label = document.createElement('span');
+            label.className = 'preview-label';
+            label.textContent = heading;
+            preview.appendChild(label);
+        }
+
+        if (tagline) {
+            const tag = document.createElement('span');
+            tag.className = 'preview-tagline';
+            tag.textContent = tagline;
+            preview.appendChild(tag);
+        }
+    }
+
+    return { preview, accent };
+}
+
+function applyCardAccent(card, accent) {
+    if (!card || !accent) {
+        return;
+    }
+
+    card.classList.add('item-card--accented');
+    card.style.setProperty('--item-accent', accent);
+
+    if (typeof accent === 'string' && accent.startsWith('#') && accent.length === 7) {
+        card.style.setProperty('--item-accent-soft', `${accent}55`);
+    }
 }
 
 function applyPropVisual(container, iconElement, prop, fallbackIcon, fallbackAccent) {
@@ -184,41 +293,90 @@ function createItemCard(item, variant) {
     card.className = `item-card item-card--${cardVariant}`;
     card.dataset.itemId = item.id;
 
-    const highlight = item.rewardData && item.rewardData.highlight;
-    if (highlight) {
-        card.classList.add('item-card--accented');
-        card.style.setProperty('--item-accent', highlight);
-        if (typeof highlight === 'string' && highlight.startsWith('#') && highlight.length === 7) {
-            card.style.setProperty('--item-accent-soft', `${highlight}55`);
+    if (item.category) {
+        card.dataset.category = item.category;
+    }
+
+    const visualType = normalizeVisualType(item.visual && item.visual.type);
+    if (visualType) {
+        card.classList.add(`item-card--${visualType}`);
+    }
+
+    const accent = (item.visual && item.visual.accent) || (item.rewardData && item.rewardData.highlight);
+    if (accent) {
+        applyCardAccent(card, accent);
+    }
+
+    const includePreview = cardVariant !== 'list';
+    if (includePreview) {
+        const { preview, accent: previewAccent } = buildCardPreview(item);
+        if (preview) {
+            card.classList.add('item-card--with-preview');
+            card.appendChild(preview);
+        }
+
+        if (!accent && previewAccent) {
+            applyCardAccent(card, previewAccent);
         }
     }
 
-    const typeLabel = formatTypeLabel(item.rewardData && item.rewardData.type);
+    const body = document.createElement('div');
+    body.className = 'card-body';
 
-    card.innerHTML = `
-        <div class="card-header">
-            <span class="card-icon">${item.icon || '💎'}</span>
-            <div class="card-meta">
-                <h3 class="card-title">${item.label}</h3>
-                <span class="card-type">${typeLabel}</span>
-            </div>
-        </div>
-        <p class="card-description">${item.description}</p>
-        <div class="card-footer">
-            <span class="card-price">${formatPrice(item.price)}</span>
-            <button class="btn ghost card-action">Kup</button>
-        </div>
-    `;
+    const header = document.createElement('div');
+    header.className = 'card-header';
+
+    const icon = document.createElement('span');
+    icon.className = 'card-icon';
+    icon.textContent = (item.icon || (item.visual && item.visual.icon) || '💎');
+    header.appendChild(icon);
+
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+
+    const title = document.createElement('h3');
+    title.className = 'card-title';
+    title.textContent = item.label;
+    meta.appendChild(title);
+
+    const typeValue = formatTypeLabel(item.rewardData && item.rewardData.type);
+    if (typeValue) {
+        const type = document.createElement('span');
+        type.className = 'card-type';
+        type.textContent = typeValue;
+        meta.appendChild(type);
+    }
+
+    header.appendChild(meta);
+    body.appendChild(header);
+
+    const description = document.createElement('p');
+    description.className = 'card-description';
+    description.textContent = item.description || '';
+    body.appendChild(description);
+
+    const footer = document.createElement('div');
+    footer.className = 'card-footer';
+
+    const price = document.createElement('span');
+    price.className = 'card-price';
+    price.textContent = formatPrice(item.price);
+    footer.appendChild(price);
+
+    const button = document.createElement('button');
+    button.className = 'btn ghost card-action';
+    button.textContent = 'Kup';
+    footer.appendChild(button);
+
+    body.appendChild(footer);
+    card.appendChild(body);
 
     card.addEventListener('click', () => openModal(item));
 
-    const button = card.querySelector('.card-action');
-    if (button) {
-        button.addEventListener('click', (event) => {
-            event.stopPropagation();
-            openModal(item);
-        });
-    }
+    button.addEventListener('click', (event) => {
+        event.stopPropagation();
+        openModal(item);
+    });
 
     return card;
 }
@@ -633,6 +791,9 @@ function resetCrateOverlay() {
     if (crateRewardRarity) {
         crateRewardRarity.style.color = '';
     }
+    if (crateRewardDetail) {
+        crateRewardDetail.textContent = '';
+    }
     if (crateRewardProp) {
         crateRewardProp.style.background = '';
         crateRewardProp.style.borderColor = '';
@@ -702,6 +863,47 @@ function buildCrateCards(pool, selection, highlight) {
     return cards;
 }
 
+function formatCrateDetail(selection) {
+    if (!selection) {
+        return '';
+    }
+
+    if (selection.displayName) {
+        return selection.displayName;
+    }
+
+    const details = selection.rewardDetails || {};
+    if (details.displayName) {
+        return details.displayName;
+    }
+
+    const rewardType = details.rewardType || selection.rewardType;
+
+    if (rewardType === 'vehicle' && details.model) {
+        return String(details.model).toUpperCase();
+    }
+
+    if (rewardType === 'weapon' && details.weapon) {
+        return String(details.weapon).toUpperCase();
+    }
+
+    if (rewardType === 'money' && typeof details.amount === 'number') {
+        const formatted = details.amount.toLocaleString('pl-PL');
+        return details.account ? `${formatted} ${details.account}` : formatted;
+    }
+
+    if (rewardType === 'item' && details.item) {
+        const count = typeof details.count === 'number' && details.count > 1 ? `${details.count}× ` : '';
+        return `${count}${details.item}`;
+    }
+
+    if (rewardType === 'group' && details.group) {
+        return details.group;
+    }
+
+    return formatTypeLabel(rewardType);
+}
+
 function playCrateAnimation(item, context) {
     if (!crateOverlay || !context || context.type !== 'crate') {
         return;
@@ -728,6 +930,9 @@ function playCrateAnimation(item, context) {
     const glowColor = withAlpha(activeAccent, '33') || activeAccent;
 
     crateRewardLabel.textContent = selection.label || 'Nagroda';
+    if (crateRewardDetail) {
+        crateRewardDetail.textContent = formatCrateDetail(selection);
+    }
     if (crateRewardRarity) {
         crateRewardRarity.textContent = formatRarityLabel(selection.rarity) || 'Tajemnicza';
         crateRewardRarity.style.color = activeAccent;

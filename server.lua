@@ -334,7 +334,12 @@ local function giveDirectReward(xPlayer, rewardData)
         if rewardData.item then
             local count = rewardData.count or 1
             xPlayer.addInventoryItem(rewardData.item, count)
-            return true, { rewardType = 'item' }
+            return true, {
+                rewardType = 'item',
+                item = rewardData.item,
+                count = count,
+                displayName = rewardData.displayName or rewardData.item
+            }
         end
         return false, 'invalid_item'
     elseif rewardType == 'money' then
@@ -350,25 +355,43 @@ local function giveDirectReward(xPlayer, rewardData)
             xPlayer.addAccountMoney(account, amount)
         end
 
-        return true, { rewardType = 'money', amount = amount, account = account }
+        return true, {
+            rewardType = 'money',
+            amount = amount,
+            account = account,
+            displayName = rewardData.displayName or ('%s %s'):format(amount, account)
+        }
     elseif rewardType == 'group' then
         if rewardData.group then
             local identifier = getPlayerIdentifier(xPlayer)
             if identifier then
                 ExecuteCommand(('add_ace %s %s allow'):format(identifier, rewardData.group))
-                return true, { rewardType = 'group', group = rewardData.group }
+                return true, {
+                    rewardType = 'group',
+                    group = rewardData.group,
+                    displayName = rewardData.displayName or rewardData.group
+                }
             end
         end
         return false, 'invalid_group'
     elseif rewardType == 'vehicle' then
         print(('[Ghost Market] Gracz %s (%s) zakupił pojazd %s. Zintegruj nagrodę z zewnętrznym systemem garażu.')
             :format(xPlayer.getName(), getPlayerIdentifier(xPlayer) or 'unknown', rewardData.model or 'unknown'))
-        return true, { rewardType = 'vehicle', model = rewardData.model }
+        return true, {
+            rewardType = 'vehicle',
+            model = rewardData.model,
+            displayName = rewardData.displayName or rewardData.model
+        }
     elseif rewardType == 'weapon' then
         if rewardData.weapon then
             local ammo = rewardData.ammo or 0
             xPlayer.addWeapon(rewardData.weapon, ammo)
-            return true, { rewardType = 'weapon', weapon = rewardData.weapon }
+            return true, {
+                rewardType = 'weapon',
+                weapon = rewardData.weapon,
+                ammo = ammo,
+                displayName = rewardData.displayName or rewardData.weapon
+            }
         end
         return false, 'invalid_weapon'
     end
@@ -466,7 +489,9 @@ local function processReward(xPlayer, rewardData)
                 rarity = selectedEntry.rarity,
                 prop = selectedEntry.prop,
                 rewardType = nestedInfo and nestedInfo.rewardType or (selectedEntry.reward and selectedEntry.reward.type),
-                rewardDetails = nestedInfo
+                rewardDetails = nestedInfo,
+                displayName = (selectedEntry.reward and selectedEntry.reward.displayName)
+                    or (nestedInfo and nestedInfo.displayName)
             },
             poolPreview = sanitizedPool
         }
