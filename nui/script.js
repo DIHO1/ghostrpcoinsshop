@@ -43,6 +43,7 @@ const crateReel = document.getElementById('crateReel');
 const crateSummary = document.getElementById('crateSummary');
 const crateRewardProp = document.getElementById('crateRewardProp');
 const cratePropIcon = document.getElementById('cratePropIcon');
+const crateRewardIcon = document.getElementById('crateRewardIcon');
 const crateRewardLabel = document.getElementById('crateRewardLabel');
 const crateRewardRarity = document.getElementById('crateRewardRarity');
 const crateContinue = document.getElementById('crateContinue');
