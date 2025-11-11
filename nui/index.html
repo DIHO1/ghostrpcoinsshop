@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghost Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-filter"></div>
+    <div class="tablet-shell">
+        <div class="tablet-glow"></div>
+        <div class="tablet-frame">
+            <div class="tablet-camera"></div>
+            <div class="tablet-speaker"></div>
+            <div id="app" class="market tablet-display hidden">
+                <div class="tablet-statusbar">
+                    <div class="status-info">
+                        <span class="status-clock" id="statusClock">20:28</span>
+                        <span class="status-tag">Ghost Network</span>
+                    </div>
+                    <div class="status-indicators">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+
+                <div class="tablet-layout">
+                    <aside class="tablet-nav">
+                        <div class="nav-header">
+                            <span class="nav-title">Menu</span>
+                        </div>
+                        <nav class="nav-links">
+                            <button class="nav-link active" data-target="hero">Przegląd</button>
+                            <button class="nav-link" data-target="sections">Kolekcje</button>
+                            <button class="nav-link" data-target="activity">Aktywność</button>
+                            <button class="nav-link" data-target="wallet">Portfel</button>
+                        </nav>
+                    </aside>
+
+                    <div class="tablet-main">
+                        <header class="market-header">
+                            <div class="brand">
+                                <span class="brand-logo">Ghost Market</span>
+                                <span class="brand-badge">// ver.2028</span>
+                            </div>
+                            <div class="wallet" id="walletDisplay">
+                                <span class="wallet-label">Saldo</span>
+                                <span class="wallet-value" id="walletValue">💎 0</span>
+                            </div>
+                        </header>
+
+                        <section class="hero" id="heroSection">
+                            <div class="hero-copy">
+                                <span class="hero-badge" id="heroBadge">Nowość</span>
+                                <h1 class="hero-title" id="heroTitle">Ghost Market</h1>
+                                <p class="hero-subtitle" id="heroSubtitle">Ekskluzywny sklep premium dla społeczności Ghost.</p>
+                                <div class="hero-meta">
+                                    <span class="hero-countdown" id="heroCountdown">Koniec za: --</span>
+                                </div>
+                                <div class="hero-actions">
+                                    <button class="btn ghost" id="heroPrimary">Sprawdź skrzynki</button>
+                                    <button class="btn outline" id="heroSecondary">Kup pojazd</button>
+                                </div>
+                            </div>
+                            <div class="hero-featured" id="heroFeatured"></div>
+                        </section>
+
+                        <main class="market-content" id="contentScroll">
+                            <div class="sections" id="sectionsRoot"></div>
+
+                            <section class="catalog-section activity" data-section="activity">
+                                <header>
+                                    <h2>Aktywność</h2>
+                                    <p class="section-subtitle">Rejestr ostatnich zakupów i nagród Ghost Market.</p>
+                                </header>
+                                <div class="activity-log" id="activityLog">
+                                    <p class="placeholder">Brak ostatnich zakupów. Dokonaj transakcji, aby pojawiły się wpisy.</p>
+                                </div>
+                            </section>
+                        </main>
+
+                        <footer class="market-footer">
+                            <span>© 2028 Ghost Market. Wszystkie prawa zastrzeżone.</span>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">Potwierdzenie zakupu</h2>
+            <p id="modalDescription">Czy na pewno kupić?</p>
+            <div class="modal-actions">
+                <button class="btn ghost" id="confirmPurchase">Kup</button>
+                <button class="btn outline" id="cancelPurchase">Anuluj</button>
+            </div>
+            <p class="modal-feedback" id="modalFeedback"></p>
+        </div>
+    </div>
+
+    <div id="crateOverlay" class="crate-overlay hidden">
+        <div class="crate-screen">
+            <header class="crate-header">
+                <span class="crate-title" id="crateTitle">Skrzynia</span>
+                <button class="crate-close" id="crateClose" aria-label="Zamknij">×</button>
+            </header>
+            <div class="crate-body">
+                <div class="crate-reel" id="crateReel">
+                    <div class="crate-indicator"></div>
+                    <div class="crate-track" id="crateTrack"></div>
+                </div>
+                <div class="crate-summary" id="crateSummary">
+                    <span class="crate-item-icon" id="crateRewardIcon">🎁</span>
+                    <div class="crate-item-details">
+                        <span class="crate-item-label" id="crateRewardLabel">Nagroda</span>
+                        <span class="crate-item-rarity" id="crateRewardRarity"></span>
+                    </div>
+                    <button class="btn ghost" id="crateContinue">Kontynuuj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
