@@ -176,9 +176,11 @@ body.market-active .tablet-shell {
 .tablet-layout {
     flex: 1;
     display: grid;
-    grid-template-columns: 240px 1fr;
+    grid-template-columns: 260px 1fr;
     gap: 32px;
     padding: 0 36px 36px;
+    min-height: 0;
+    align-items: stretch;
 }
 
 .tablet-nav {
@@ -191,6 +193,18 @@ body.market-active .tablet-shell {
     box-shadow: 0 30px 80px rgba(7, 18, 46, 0.6);
     backdrop-filter: blur(14px);
     gap: 24px;
+    overflow-y: auto;
+    max-height: 100%;
+    min-height: 0;
+}
+
+.tablet-nav::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tablet-nav::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(109, 214, 255, 0.5), rgba(125, 255, 179, 0.5));
+    border-radius: 999px;
 }
 
 .nav-header {
@@ -243,10 +257,13 @@ body.market-active .tablet-shell {
 }
 
 .tablet-main {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 26px;
     overflow: hidden;
+    flex: 1;
+    min-height: 0;
 }
 
 .market {
@@ -255,6 +272,7 @@ body.market-active .tablet-shell {
     flex-direction: column;
     gap: 26px;
     padding: 0;
+    min-height: 0;
 }
 
 .market-header {
@@ -392,7 +410,9 @@ body.market-active .tablet-shell {
     display: flex;
     flex-direction: column;
     gap: 34px;
-    padding-right: 6px;
+    padding-right: 14px;
+    min-height: 0;
+    scroll-behavior: smooth;
 }
 
 .market-content::-webkit-scrollbar {
