@@ -156,13 +156,13 @@ Config.Catalog = {
                             prop = {
                                 icon = '🛰️',
                                 color = '#6afff2',
-                                image = 'images/props/group_overseer.svg',
+                                  image = 'images/props/group_overseer.svg',
                                 model = 'prop_ld_keypad_01'
                             },
                             reward = {
                                 type = 'group',
                                 group = 'ghost.overseer',
-                                displayName = 'Uprawnienia Overseer',
+                                  displayName = 'Uprawnienia Overseer',
                                 worldModel = 'prop_ld_keypad_01'
                             }
                         },
@@ -277,8 +277,7 @@ Config.Catalog = {
                             prop = {
                                 icon = '💎',
                                 color = '#29f1ff',
-                                image = 'images/props/cash_cache.svg',
-                                model = 'prop_cash_crate_01'
+                                image = 'images/props/cash_cache.svg'
                             },
                             reward = {
                                 type = 'money',
