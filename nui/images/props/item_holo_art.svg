@@ -1,0 +1,15 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'>
+<defs>
+    <linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'>
+        <stop offset='0%' stop-color='#ffb76b' stop-opacity='0.4'/>
+        <stop offset='100%' stop-color='#ffb76b' stop-opacity='0.85'/>
+    </linearGradient>
+</defs>
+<rect width='400' height='400' rx='48' fill='url(#bg)'/>
+<rect width='400' height='400' rx='48' fill='rgba(4,10,24,0.55)'/>
+<g fill='#ffb76b' transform='translate(100,80)'>
+    <polygon points='100,0 220,60 220,180 100,240 -20,180 -20,60' opacity='0.9'/>
+    <polygon points='100,20 200,70 200,170 100,220 0,170 0,70' fill='rgba(255,255,255,0.18)'/>
+</g>
+<text x='200' y='340' font-family='"Orbitron", "Rajdhani", "Segoe UI", sans-serif' font-size='44' text-anchor='middle' fill='rgba(236,244,255,0.92)'>Holo Art</text>
+</svg>

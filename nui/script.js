@@ -210,28 +210,38 @@ function applyCardAccent(card, accent) {
 
 function applyPropVisual(container, iconElement, prop, fallbackIcon, fallbackAccent) {
     const accent = (prop && typeof prop.color === 'string' && prop.color) || fallbackAccent || '#62f6ff';
+    const hasImage = !!(prop && typeof prop.image === 'string' && prop.image.length > 0);
 
     if (iconElement) {
-        iconElement.textContent = (prop && prop.icon) || fallbackIcon || '🎁';
+        if (hasImage) {
+            iconElement.textContent = '';
+            iconElement.classList.add('prop-icon--hidden');
+        } else {
+            iconElement.textContent = (prop && prop.icon) || fallbackIcon || '🎁';
+            iconElement.classList.remove('prop-icon--hidden');
+        }
     }
 
     if (!container) {
         return accent;
     }
 
-    if (prop && prop.image) {
-        container.style.backgroundImage = `url(${prop.image})`;
+    const gradientBackground = prop && prop.background
+        ? prop.background
+        : `linear-gradient(155deg, ${withAlpha(accent, '3d') || `${accent}3d`}, rgba(12, 26, 60, 0.88))`;
+
+    if (hasImage) {
+        container.style.background = `${gradientBackground}, url(${prop.image})`;
         container.style.backgroundSize = 'cover';
         container.style.backgroundPosition = 'center';
+        container.classList.add('prop--image');
     } else {
-        container.style.backgroundImage = '';
+        container.style.background = gradientBackground;
+        container.style.backgroundSize = '';
+        container.style.backgroundPosition = '';
+        container.classList.remove('prop--image');
     }
 
-    const background = prop && prop.background
-        ? prop.background
-        : `linear-gradient(150deg, ${withAlpha(accent, '33') || `${accent}33`}, rgba(12, 26, 60, 0.85))`;
-
-    container.style.background = background;
     container.style.boxShadow = `0 26px 70px ${withAlpha(accent, '33') || `${accent}33`}`;
     container.style.borderColor = withAlpha(accent, '55') || accent;
 
@@ -799,9 +809,13 @@ function resetCrateOverlay() {
         crateRewardProp.style.borderColor = '';
         crateRewardProp.style.boxShadow = '';
         crateRewardProp.style.backgroundImage = '';
+        crateRewardProp.style.backgroundSize = '';
+        crateRewardProp.style.backgroundPosition = '';
+        crateRewardProp.classList.remove('prop--image');
     }
     if (cratePropIcon) {
         cratePropIcon.textContent = '🎁';
+        cratePropIcon.classList.remove('prop-icon--hidden');
     }
     crateTrack.innerHTML = '';
 }

@@ -872,6 +872,16 @@ body.market-active .background-filter {
     font-size: 1.6rem;
     background: rgba(111, 214, 255, 0.15);
     border: 1px solid rgba(111, 214, 255, 0.32);
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.crate-card .prop span,
+.crate-prop-icon {
+    position: relative;
+    z-index: 1;
 }
 
 .crate-card .info {
@@ -939,6 +949,22 @@ body.market-active .background-filter {
     background: rgba(90, 173, 255, 0.18);
     border: 1px solid rgba(111, 214, 255, 0.28);
     font-size: 2rem;
+    position: relative;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+}
+
+.prop--image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(155deg, rgba(6, 14, 30, 0.2), rgba(6, 14, 30, 0.55));
+    pointer-events: none;
+}
+
+.prop-icon--hidden {
+    display: none !important;
 }
 
 .crate-item-details {

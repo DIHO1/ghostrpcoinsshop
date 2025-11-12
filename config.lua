@@ -73,7 +73,8 @@ Config.Catalog = {
                     icon = '🧪',
                     accent = '#62f6ff',
                     label = 'Prototypy',
-                    tagline = 'Laboratoryjne projekty Ghost'
+                    tagline = 'Laboratoryjne projekty Ghost',
+                    image = 'images/props/item_nitro.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -89,7 +90,8 @@ Config.Catalog = {
                             weight = 6,
                             prop = {
                                 icon = '🚗',
-                                color = '#62f6ff'
+                                color = '#62f6ff',
+                                image = 'images/props/vehicle_specter.svg'
                             },
                             reward = {
                                 type = 'vehicle',
@@ -111,7 +113,8 @@ Config.Catalog = {
                             weight = 14,
                             prop = {
                                 icon = '⚡',
-                                color = '#ae74ff'
+                                color = '#ae74ff',
+                                image = 'images/props/item_nitro.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -128,7 +131,8 @@ Config.Catalog = {
                             weight = 22,
                             prop = {
                                 icon = '💰',
-                                color = '#ffd66b'
+                                color = '#ffd66b',
+                                image = 'images/props/cash_grant.svg'
                             },
                             reward = {
                                 type = 'money',
@@ -145,7 +149,8 @@ Config.Catalog = {
                             weight = 10,
                             prop = {
                                 icon = '🛰️',
-                                color = '#6afff2'
+                                color = '#6afff2',
+                                image = 'images/props/group_overseer.svg'
                             },
                             reward = {
                                 type = 'group',
@@ -161,7 +166,8 @@ Config.Catalog = {
                             weight = 26,
                             prop = {
                                 icon = '📦',
-                                color = '#6da9ff'
+                                color = '#6da9ff',
+                                image = 'images/props/item_materials.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -178,7 +184,8 @@ Config.Catalog = {
                             weight = 22,
                             prop = {
                                 icon = '💎',
-                                color = '#29f1ff'
+                                color = '#29f1ff',
+                                image = 'images/props/cash_tokens.svg'
                             },
                             reward = {
                                 type = 'money',
@@ -201,7 +208,8 @@ Config.Catalog = {
                     icon = '🎁',
                     accent = '#f86bff',
                     label = 'Limitki',
-                    tagline = 'Limitowane kolekcje'
+                    tagline = 'Limitowane kolekcje',
+                    image = 'images/props/item_ghost_suit.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -217,7 +225,8 @@ Config.Catalog = {
                             weight = 8,
                             prop = {
                                 icon = '🧥',
-                                color = '#f86bff'
+                                color = '#f86bff',
+                                image = 'images/props/item_ghost_suit.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -234,7 +243,8 @@ Config.Catalog = {
                             weight = 12,
                             prop = {
                                 icon = '💳',
-                                color = '#7dffb3'
+                                color = '#7dffb3',
+                                image = 'images/props/group_vip.svg'
                             },
                             reward = {
                                 type = 'group',
@@ -250,7 +260,8 @@ Config.Catalog = {
                             weight = 18,
                             prop = {
                                 icon = '💎',
-                                color = '#29f1ff'
+                                color = '#29f1ff',
+                                image = 'images/props/cash_cache.svg'
                             },
                             reward = {
                                 type = 'money',
@@ -267,7 +278,8 @@ Config.Catalog = {
                             weight = 16,
                             prop = {
                                 icon = '🚘',
-                                color = '#62f6ff'
+                                color = '#62f6ff',
+                                image = 'images/props/vehicle_elegy.svg'
                             },
                             reward = {
                                 type = 'vehicle',
@@ -288,7 +300,8 @@ Config.Catalog = {
                             weight = 22,
                             prop = {
                                 icon = '🖼️',
-                                color = '#ffb76b'
+                                color = '#ffb76b',
+                                image = 'images/props/item_holo_art.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -305,7 +318,8 @@ Config.Catalog = {
                             weight = 24,
                             prop = {
                                 icon = '🎟️',
-                                color = '#8e9cff'
+                                color = '#8e9cff',
+                                image = 'images/props/item_event_token.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -340,7 +354,8 @@ Config.Catalog = {
                     name = 'Specter-X',
                     model = 'specter',
                     accent = '#62f6ff',
-                    tagline = 'Prototyp klasy X'
+                    tagline = 'Prototyp klasy X',
+                    image = 'images/props/vehicle_specter.svg'
                 },
                 rewardData = {
                     type = 'vehicle',
@@ -364,7 +379,8 @@ Config.Catalog = {
                     name = 'Paragon R',
                     model = 'paragon',
                     accent = '#7dffb3',
-                    tagline = 'Supersamochód klasy premium'
+                    tagline = 'Supersamochód klasy premium',
+                    image = 'images/props/vehicle_paragon.svg'
                 },
                 rewardData = {
                     type = 'vehicle',
@@ -399,7 +415,8 @@ Config.Catalog = {
                     icon = '🚙',
                     accent = '#7dffb3',
                     label = 'Pojazdy',
-                    tagline = 'Losowe nagrody garażowe'
+                    tagline = 'Losowe nagrody garażowe',
+                    image = 'images/props/vehicle_paragon.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -415,7 +432,8 @@ Config.Catalog = {
                             weight = 8,
                             prop = {
                                 icon = '🏎️',
-                                color = '#7dffb3'
+                                color = '#7dffb3',
+                                image = 'images/props/vehicle_paragon.svg'
                             },
                             reward = {
                                 type = 'vehicle',
@@ -431,7 +449,8 @@ Config.Catalog = {
                             weight = 12,
                             prop = {
                                 icon = '🚘',
-                                color = '#62d4ff'
+                                color = '#62d4ff',
+                                image = 'images/props/vehicle_comet.svg'
                             },
                             reward = {
                                 type = 'vehicle',
@@ -447,7 +466,8 @@ Config.Catalog = {
                             weight = 20,
                             prop = {
                                 icon = '🛞',
-                                color = '#ffcf6d'
+                                color = '#ffcf6d',
+                                image = 'images/props/item_drift_kit.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -464,7 +484,8 @@ Config.Catalog = {
                             weight = 25,
                             prop = {
                                 icon = '⛽',
-                                color = '#7aa9ff'
+                                color = '#7aa9ff',
+                                image = 'images/props/item_fuel.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -481,7 +502,8 @@ Config.Catalog = {
                             weight = 35,
                             prop = {
                                 icon = '💵',
-                                color = '#7cffd7'
+                                color = '#7cffd7',
+                                image = 'images/props/cash_garage.svg'
                             },
                             reward = {
                                 type = 'money',
@@ -504,7 +526,8 @@ Config.Catalog = {
                     icon = '🔫',
                     accent = '#ff9f68',
                     label = 'Arsenał',
-                    tagline = 'Broń i ulepszenia'
+                    tagline = 'Broń i ulepszenia',
+                    image = 'images/props/weapon_pistol_mk2.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -520,7 +543,8 @@ Config.Catalog = {
                             weight = 12,
                             prop = {
                                 icon = '🔧',
-                                color = '#ff9f68'
+                                color = '#ff9f68',
+                                image = 'images/props/weapon_pistol_mk2.svg'
                             },
                             reward = {
                                 type = 'weapon',
@@ -537,7 +561,8 @@ Config.Catalog = {
                             weight = 18,
                             prop = {
                                 icon = '💥',
-                                color = '#ffc86b'
+                                color = '#ffc86b',
+                                image = 'images/props/weapon_heavypistol.svg'
                             },
                             reward = {
                                 type = 'weapon',
@@ -554,7 +579,8 @@ Config.Catalog = {
                             weight = 26,
                             prop = {
                                 icon = '🕵️',
-                                color = '#9c8cff'
+                                color = '#9c8cff',
+                                image = 'images/props/weapon_snspistol.svg'
                             },
                             reward = {
                                 type = 'weapon',
@@ -571,7 +597,8 @@ Config.Catalog = {
                             weight = 24,
                             prop = {
                                 icon = '🎯',
-                                color = '#6da9ff'
+                                color = '#6da9ff',
+                                image = 'images/props/item_ammo.svg'
                             },
                             reward = {
                                 type = 'item',
@@ -588,7 +615,8 @@ Config.Catalog = {
                             weight = 10,
                             prop = {
                                 icon = '🎖️',
-                                color = '#ff6db8'
+                                color = '#ff6db8',
+                                image = 'images/props/group_weapon.svg'
                             },
                             reward = {
                                 type = 'group',
