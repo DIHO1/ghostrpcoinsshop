@@ -377,6 +377,13 @@ RegisterNUICallback('purchaseItem', function(data, cb)
     cb('ok')
 end)
 
+RegisterNUICallback('claimReward', function(data, cb)
+    if data and data.rewardId then
+        TriggerServerEvent('ghostmarket:claimReward', data.rewardId)
+    end
+    cb('ok')
+end)
+
 RegisterNetEvent('ghostmarket:updateWallet', function(balance)
     currentBalance = balance or 0
     SendNUIMessage({

@@ -952,6 +952,8 @@ function playCrateAnimation(item, context) {
         return;
     }
 
+    state.pendingRewardId = context.pendingId || null;
+
     crateOverlay.classList.remove('hidden');
     crateTitle.textContent = context.crateLabel || item.label || 'Skrzynia';
     if (crateSummary) {
@@ -1077,6 +1079,16 @@ function playCrateAnimation(item, context) {
             if (crateSummary) {
                 crateSummary.classList.add('visible');
             }
+
+            if (state.pendingRewardId) {
+                fetch(`https://${GetParentResourceName()}/claimReward`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                    body: JSON.stringify({ rewardId: state.pendingRewardId })
+                });
+                state.pendingRewardId = null;
+            }
+
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
             state.crateAnimation = null;
         };
