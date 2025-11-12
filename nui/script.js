@@ -887,11 +887,12 @@ function formatCrateDetail(selection) {
     }
 
     const details = selection.rewardDetails || {};
-    if (details.displayName) {
-        return details.displayName;
-    }
+    const rewardType = selection.rewardType || details.rewardType;
 
-    const rewardType = details.rewardType || selection.rewardType;
+    if (details.displayName) {
+        const countPrefix = typeof details.count === 'number' && details.count > 1 ? `${details.count}× ` : '';
+        return `${countPrefix}${details.displayName}`.trim();
+    }
 
     if (rewardType === 'vehicle' && details.model) {
         return String(details.model).toUpperCase();
@@ -899,6 +900,11 @@ function formatCrateDetail(selection) {
 
     if (rewardType === 'weapon' && details.weapon) {
         return String(details.weapon).toUpperCase();
+    }
+
+    if (rewardType === 'ammo' && details.weapon) {
+        const ammoCount = typeof details.ammo === 'number' && details.ammo > 0 ? `${details.ammo}× ` : '';
+        return `${ammoCount}${String(details.weapon).toUpperCase()}`.trim();
     }
 
     if (rewardType === 'money' && typeof details.amount === 'number') {
@@ -1386,7 +1392,10 @@ window.addEventListener('message', (event) => {
                     transaction_error: 'Błąd transakcji. Spróbuj ponownie.',
                     reward_failed: 'Nie udało się dostarczyć nagrody.',
                     item_not_found: 'Przedmiot niedostępny.',
-                    framework_unavailable: 'Framework niedostępny.'
+                    framework_unavailable: 'Framework niedostępny.',
+                    inventory_full: 'Brak miejsca w ekwipunku.',
+                    invalid_item: 'Przedmiot niedostępny.',
+                    invalid_ammo: 'Nie udało się dodać amunicji.'
                 };
                 modalFeedback.textContent = messages[result.reason] || 'Zakup nieudany.';
             }

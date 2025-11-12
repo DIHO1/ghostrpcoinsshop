@@ -16,6 +16,10 @@ end
 
 local purchaseCooldowns = {}
 
+local function hasOxInventory()
+    return type(GetResourceState) == 'function' and GetResourceState('ox_inventory') == 'started'
+end
+
 math.randomseed(os.time())
 math.random()
 math.random()
@@ -333,12 +337,39 @@ local function giveDirectReward(xPlayer, rewardData)
     if rewardType == 'item' then
         if rewardData.item then
             local count = rewardData.count or 1
-            xPlayer.addInventoryItem(rewardData.item, count)
+            local metadata = rewardData.metadata
+            local itemName = rewardData.item
+            local source = xPlayer.source
+
+            if hasOxInventory() then
+                local ok, added = pcall(function()
+                    return exports.ox_inventory:AddItem(source, itemName, count, metadata)
+                end)
+
+                if not ok or not added then
+                    return false, 'inventory_full'
+                end
+            else
+                if xPlayer.canCarryItem and not xPlayer.canCarryItem(itemName, count) then
+                    return false, 'inventory_full'
+                end
+
+                local ok, err = pcall(function()
+                    xPlayer.addInventoryItem(itemName, count)
+                end)
+
+                if not ok then
+                    print(('^1[Ghost Market]^7 Nie można dodać przedmiotu %s: %s'):format(itemName, err or 'nieznany błąd'))
+                    return false, 'invalid_item'
+                end
+            end
+
             return true, {
                 rewardType = 'item',
-                item = rewardData.item,
+                item = itemName,
                 count = count,
-                displayName = rewardData.displayName or rewardData.item
+                metadata = metadata,
+                displayName = rewardData.displayName or itemName
             }
         end
         return false, 'invalid_item'
@@ -394,6 +425,38 @@ local function giveDirectReward(xPlayer, rewardData)
             }
         end
         return false, 'invalid_weapon'
+    elseif rewardType == 'ammo' then
+        local weapon = rewardData.weapon
+        local ammo = rewardData.ammo or rewardData.count or 0
+
+        if not weapon or ammo <= 0 then
+            return false, 'invalid_ammo'
+        end
+
+        local weaponName = tostring(weapon)
+
+        if xPlayer.addWeaponAmmo then
+            xPlayer.addWeaponAmmo(weaponName, ammo)
+        else
+            local ped = GetPlayerPed(xPlayer.source)
+            local weaponHash = GetHashKey(weaponName)
+            if ped and ped ~= 0 then
+                if xPlayer.hasWeapon and xPlayer.hasWeapon(weaponName) then
+                    AddAmmoToPed(ped, weaponHash, ammo)
+                else
+                    GiveWeaponToPed(ped, weaponHash, ammo, false, true)
+                end
+            else
+                xPlayer.addWeapon(weaponName, ammo)
+            end
+        end
+
+        return true, {
+            rewardType = 'ammo',
+            weapon = weaponName,
+            ammo = ammo,
+            displayName = rewardData.displayName or weaponName
+        }
     end
 
     return false, 'unknown_type'
