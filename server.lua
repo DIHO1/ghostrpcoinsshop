@@ -998,28 +998,6 @@ RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
                     rewardContext = rewardDetailsOrReason
                 })
             end
-
-            purchaseCooldowns[identifier] = now
-
-            print(('[Ghost Market] Gracz %s (%s) kupił %s za %d %s.')
-                :format(xPlayer.getName(), identifier, selectedItem.label, selectedItem.price, Config.Currency.symbol))
-
-            if type(rewardDetailsOrReason) == 'table' and rewardDetailsOrReason.type == 'crate' then
-                local selection = rewardDetailsOrReason.selection or {}
-                print(('[Ghost Market]   › Skrzynia %s wylosowała %s (%s).')
-                    :format(rewardDetailsOrReason.crateLabel or selectedItem.label,
-                        selection.label or 'nieznana nagroda', selection.rarity or 'brak rzadkości'))
-            end
-
-            TriggerClientEvent('ghostmarket:purchaseResult', src, {
-                success = true,
-                balance = newBalance,
-                item = {
-                    id = selectedItem.id,
-                    label = selectedItem.label
-                },
-                rewardContext = rewardDetailsOrReason
-            })
         end)
     end)
 end)
