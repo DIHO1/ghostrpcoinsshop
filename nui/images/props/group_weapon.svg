@@ -1,0 +1,15 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'>
+<defs>
+    <linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'>
+        <stop offset='0%' stop-color='#ff6db8' stop-opacity='0.4'/>
+        <stop offset='100%' stop-color='#ff6db8' stop-opacity='0.85'/>
+    </linearGradient>
+</defs>
+<rect width='400' height='400' rx='48' fill='url(#bg)'/>
+<rect width='400' height='400' rx='48' fill='rgba(4,10,24,0.55)'/>
+<g fill='#ff6db8' transform='translate(120,60)'>
+    <path d='M80 0 L160 40 V160 C160 220 120 260 80 300 C40 260 0 220 0 160 V40 Z' opacity='0.85'/>
+    <path d='M80 30 L140 60 V150 C140 195 110 230 80 260 C50 230 20 195 20 150 V60 Z' fill='rgba(4,10,24,0.45)'/>
+</g>
+<text x='200' y='340' font-family='"Orbitron", "Rajdhani", "Segoe UI", sans-serif' font-size='44' text-anchor='middle' fill='rgba(236,244,255,0.92)'>Weapons</text>
+</svg>
