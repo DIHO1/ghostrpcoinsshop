@@ -195,20 +195,72 @@ local function spawnCratePreview(context)
     cratePreview.cam = cam
 
     CreateThread(function()
-        local angle = heading
-        while cratePreview.entity == entity do
-            angle = angle + 0.25
-            if angle >= 360.0 then
-                angle = angle - 360.0
+        if not cratePreview or not cratePreview.entity or not DoesEntityExist(entity) then return end
+
+        local startTime = GetGameTimer()
+        local duration = 10000 -- 10 seconds
+        local endTime = startTime + duration
+
+        local initialHeading = GetEntityHeading(entity)
+        local totalRotation = 720.0 -- Two full rotations
+
+        local pointAtOffset = rewardType == 'vehicle' and 0.5 or 0.2
+
+        local pedForward = GetEntityForwardVector(PlayerPedId())
+        local rightVector = vector3(pedForward.y, -pedForward.x, 0)
+
+        while GetGameTimer() < endTime do
+            if not cratePreview or cratePreview.entity ~= entity or not DoesEntityExist(entity) then
+                break
             end
 
+            local elapsed = GetGameTimer() - startTime
+            local progress = elapsed / duration -- 0.0 to 1.0
+            local easedProgress = -0.5 * (math.cos(math.pi * progress) - 1)
+
+            -- Rotate entity
+            local currentRotation = initialHeading + totalRotation * easedProgress
             if IsEntityAVehicle(entity) then
-                SetEntityHeading(entity, angle)
+                SetEntityHeading(entity, currentRotation)
             else
-                SetEntityRotation(entity, 0.0, 0.0, angle, 2, true)
+                SetEntityRotation(entity, 0.0, 0.0, currentRotation, 2, true)
             end
+
+            -- Animate camera
+            local orbitAngle = math.rad(180 * easedProgress) -- Orbit 180 degrees
+            local currentDistance = camDistance + 1.5 - (1.5 * easedProgress) -- Zoom in
+            local currentHeight = camHeight - 0.5 + (0.5 * easedProgress) -- Rise up
+
+            local camOffsetX = -pedForward.x * math.cos(orbitAngle) + rightVector.x * math.sin(orbitAngle)
+            local camOffsetY = -pedForward.y * math.cos(orbitAngle) + rightVector.y * math.sin(orbitAngle)
+
+            local camX = spawnCoords.x + camOffsetX * currentDistance
+            local camY = spawnCoords.y + camOffsetY * currentDistance
+
+            SetCamCoord(cam, camX, camY, spawnCoords.z + currentHeight)
+            PointCamAtCoord(cam, spawnCoords.x, spawnCoords.y, spawnCoords.z + pointAtOffset)
 
             Wait(0)
+        end
+
+        if cratePreview and cratePreview.entity == entity and DoesEntityExist(entity) then
+            -- Set final state
+            local finalRotation = initialHeading + totalRotation
+            if IsEntityAVehicle(entity) then
+                SetEntityHeading(entity, finalRotation)
+            else
+                SetEntityRotation(entity, 0.0, 0.0, finalRotation, 2, true)
+            end
+
+            local finalOrbitAngle = math.rad(180)
+            local finalCamOffsetX = -pedForward.x * math.cos(finalOrbitAngle) + rightVector.x * math.sin(finalOrbitAngle)
+            local finalCamOffsetY = -pedForward.y * math.cos(finalOrbitAngle) + rightVector.y * math.sin(finalOrbitAngle)
+
+            local finalCamX = spawnCoords.x + finalCamOffsetX * camDistance
+            local finalCamY = spawnCoords.y + finalCamOffsetY * camDistance
+
+            SetCamCoord(cam, finalCamX, finalCamY, spawnCoords.z + camHeight)
+            PointCamAtCoord(cam, spawnCoords.x, spawnCoords.y, spawnCoords.z + pointAtOffset)
         end
     end)
 
