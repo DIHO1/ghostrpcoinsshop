@@ -210,10 +210,10 @@ function applyCardAccent(card, accent) {
 
 function applyPropVisual(container, iconElement, prop, fallbackIcon, fallbackAccent) {
     const accent = (prop && typeof prop.color === 'string' && prop.color) || fallbackAccent || '#62f6ff';
-    const hasImage = !!(prop && typeof prop.image === 'string' && prop.image.length > 0);
+    const hasWorldModel = !!(prop && (prop.worldModel || prop.model || prop.vehicleModel || prop.weaponModel));
 
     if (iconElement) {
-        if (hasImage) {
+        if (hasWorldModel) {
             iconElement.textContent = '';
             iconElement.classList.add('prop-icon--hidden');
         } else {
@@ -230,16 +230,30 @@ function applyPropVisual(container, iconElement, prop, fallbackIcon, fallbackAcc
         ? prop.background
         : `linear-gradient(155deg, ${withAlpha(accent, '3d') || `${accent}3d`}, rgba(12, 26, 60, 0.88))`;
 
-    if (hasImage) {
-        container.style.background = `${gradientBackground}, url(${prop.image})`;
-        container.style.backgroundSize = 'cover';
-        container.style.backgroundPosition = 'center';
-        container.classList.add('prop--image');
+    container.style.background = gradientBackground;
+    container.style.backgroundSize = '';
+    container.style.backgroundPosition = '';
+    container.classList.remove('prop--image');
+
+    if (hasWorldModel) {
+        container.classList.add('prop--world');
+        const modelLabel = (
+            prop.model ||
+            prop.worldModel ||
+            prop.vehicleModel ||
+            prop.weaponModel ||
+            prop.displayName ||
+            prop.label ||
+            ''
+        ).toString();
+        if (modelLabel) {
+            container.dataset.model = modelLabel.toUpperCase();
+        } else {
+            delete container.dataset.model;
+        }
     } else {
-        container.style.background = gradientBackground;
-        container.style.backgroundSize = '';
-        container.style.backgroundPosition = '';
-        container.classList.remove('prop--image');
+        container.classList.remove('prop--world');
+        delete container.dataset.model;
     }
 
     container.style.boxShadow = `0 26px 70px ${withAlpha(accent, '33') || `${accent}33`}`;
@@ -812,6 +826,8 @@ function resetCrateOverlay() {
         crateRewardProp.style.backgroundSize = '';
         crateRewardProp.style.backgroundPosition = '';
         crateRewardProp.classList.remove('prop--image');
+        crateRewardProp.classList.remove('prop--world');
+        delete crateRewardProp.dataset.model;
     }
     if (cratePropIcon) {
         cratePropIcon.textContent = '🎁';
@@ -1051,7 +1067,7 @@ function playCrateAnimation(item, context) {
             { transform: 'translateX(0)' },
             { transform: `translateX(-${targetOffset}px)` }
         ], {
-            duration: 4600,
+            duration: 10000,
             easing: 'cubic-bezier(0.12, 0.01, 0, 1)',
             fill: 'forwards'
         });

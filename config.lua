@@ -74,7 +74,6 @@ Config.Catalog = {
                     accent = '#62f6ff',
                     label = 'Prototypy',
                     tagline = 'Laboratoryjne projekty Ghost',
-                    image = 'images/props/item_nitro.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -91,7 +90,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚗',
                                 color = '#62f6ff',
-                                image = 'images/props/vehicle_specter.svg',
                                 model = 'specter'
                             },
                             reward = {
@@ -116,7 +114,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '⚡',
                                 color = '#ae74ff',
-                                image = 'images/props/item_nitro.svg',
                                 model = 'prop_ld_jerrycan_01'
                             },
                             reward = {
@@ -136,7 +133,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '💰',
                                 color = '#ffd66b',
-                                image = 'images/props/cash_grant.svg',
                                 model = 'prop_cash_case_01'
                             },
                             reward = {
@@ -156,13 +152,12 @@ Config.Catalog = {
                             prop = {
                                 icon = '🛰️',
                                 color = '#6afff2',
-                                  image = 'images/props/group_overseer.svg',
                                 model = 'prop_ld_keypad_01'
                             },
                             reward = {
                                 type = 'group',
                                 group = 'ghost.overseer',
-                                  displayName = 'Uprawnienia Overseer',
+                                displayName = 'Uprawnienia Overseer',
                                 worldModel = 'prop_ld_keypad_01'
                             }
                         },
@@ -175,7 +170,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '📦',
                                 color = '#6da9ff',
-                                image = 'images/props/item_materials.svg',
                                 model = 'prop_boxpile_07d'
                             },
                             reward = {
@@ -195,7 +189,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '💎',
                                 color = '#29f1ff',
-                                image = 'images/props/cash_tokens.svg',
                                 model = 'prop_cash_pile_02'
                             },
                             reward = {
@@ -221,7 +214,6 @@ Config.Catalog = {
                     accent = '#f86bff',
                     label = 'Limitki',
                     tagline = 'Limitowane kolekcje',
-                    image = 'images/props/item_ghost_suit.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -238,7 +230,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🧥',
                                 color = '#f86bff',
-                                image = 'images/props/item_ghost_suit.svg',
                                 model = 'prop_ld_suitcase_01'
                             },
                             reward = {
@@ -258,7 +249,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '💳',
                                 color = '#7dffb3',
-                                image = 'images/props/group_vip.svg',
                                 model = 'prop_ld_wallet_01'
                             },
                             reward = {
@@ -277,7 +267,7 @@ Config.Catalog = {
                             prop = {
                                 icon = '💎',
                                 color = '#29f1ff',
-                                image = 'images/props/cash_cache.svg'
+                                model = 'prop_cash_crate_01'
                             },
                             reward = {
                                 type = 'money',
@@ -296,7 +286,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚘',
                                 color = '#62f6ff',
-                                image = 'images/props/vehicle_elegy.svg',
                                 model = 'elegy'
                             },
                             reward = {
@@ -320,7 +309,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🖼️',
                                 color = '#ffb76b',
-                                image = 'images/props/item_holo_art.svg',
                                 model = 'prop_painting_01'
                             },
                             reward = {
@@ -340,7 +328,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎟️',
                                 color = '#8e9cff',
-                                image = 'images/props/item_event_token.svg',
                                 model = 'prop_ld_wallet_01'
                             },
                             reward = {
@@ -378,7 +365,6 @@ Config.Catalog = {
                     model = 'specter',
                     accent = '#62f6ff',
                     tagline = 'Prototyp klasy X',
-                    image = 'images/props/vehicle_specter.svg'
                 },
                 rewardData = {
                     type = 'vehicle',
@@ -404,7 +390,6 @@ Config.Catalog = {
                     model = 'paragon',
                     accent = '#7dffb3',
                     tagline = 'Supersamochód klasy premium',
-                    image = 'images/props/vehicle_paragon.svg'
                 },
                 rewardData = {
                     type = 'vehicle',
@@ -441,7 +426,6 @@ Config.Catalog = {
                     accent = '#7dffb3',
                     label = 'Pojazdy',
                     tagline = 'Losowe nagrody garażowe',
-                    image = 'images/props/vehicle_paragon.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -458,7 +442,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🏎️',
                                 color = '#7dffb3',
-                                image = 'images/props/vehicle_paragon.svg',
                                 model = 'paragon'
                             },
                             reward = {
@@ -477,7 +460,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚘',
                                 color = '#62d4ff',
-                                image = 'images/props/vehicle_comet.svg',
                                 model = 'comet5'
                             },
                             reward = {
@@ -496,7 +478,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🛞',
                                 color = '#ffcf6d',
-                                image = 'images/props/item_drift_kit.svg',
                                 model = 'prop_carcreeper'
                             },
                             reward = {
@@ -516,7 +497,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '⛽',
                                 color = '#7aa9ff',
-                                image = 'images/props/item_fuel.svg',
                                 model = 'prop_ld_jerrycan_01'
                             },
                             reward = {
@@ -536,7 +516,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '💵',
                                 color = '#7cffd7',
-                                image = 'images/props/cash_garage.svg',
                                 model = 'prop_cash_case_02'
                             },
                             reward = {
@@ -562,7 +541,6 @@ Config.Catalog = {
                     accent = '#ff9f68',
                     label = 'Arsenał',
                     tagline = 'Broń i ulepszenia',
-                    image = 'images/props/weapon_pistol_mk2.svg'
                 },
                 rewardData = {
                     type = 'crate',
@@ -579,7 +557,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🔧',
                                 color = '#ff9f68',
-                                image = 'images/props/weapon_pistol_mk2.svg',
                                 model = 'w_pi_pistolmk2'
                             },
                             reward = {
@@ -599,7 +576,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '💥',
                                 color = '#ffc86b',
-                                image = 'images/props/weapon_heavypistol.svg',
                                 model = 'w_pi_heavypistol'
                             },
                             reward = {
@@ -619,7 +595,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🕵️',
                                 color = '#9c8cff',
-                                image = 'images/props/weapon_snspistol.svg',
                                 model = 'w_pi_sns_pistol'
                             },
                             reward = {
@@ -639,7 +614,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎯',
                                 color = '#6da9ff',
-                                image = 'images/props/item_ammo.svg',
                                 model = 'prop_ld_ammo_pack_01'
                             },
                             reward = {
@@ -659,7 +633,6 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎖️',
                                 color = '#ff6db8',
-                                image = 'images/props/group_weapon.svg',
                                 model = 'prop_ld_keypad_01'
                             },
                             reward = {

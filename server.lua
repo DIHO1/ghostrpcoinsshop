@@ -503,9 +503,12 @@ local function sanitizeCrateProp(prop)
     return {
         icon = prop.icon,
         color = prop.color,
-        image = prop.image,
         model = prop.model,
-        worldModel = prop.worldModel or prop.model
+        worldModel = prop.worldModel or prop.model,
+        vehicleModel = prop.vehicleModel,
+        weaponModel = prop.weaponModel,
+        displayName = prop.displayName,
+        label = prop.label
     }
 end
 
@@ -514,12 +517,18 @@ local function sanitizeCrateEntry(entry)
         return nil
     end
 
+    local prop = sanitizeCrateProp(entry.prop)
+    if prop then
+        prop.displayName = prop.displayName or entry.displayName or entry.label
+        prop.label = prop.label or entry.label
+    end
+
     return {
         id = entry.id,
         label = entry.label,
         icon = entry.icon,
         rarity = entry.rarity,
-        prop = sanitizeCrateProp(entry.prop)
+        prop = prop
     }
 end
 
@@ -560,6 +569,14 @@ local function processReward(xPlayer, rewardData)
 
         local sanitizedPool = sanitizeCratePool(pool)
 
+        local selectionProp = sanitizeCrateProp(selectedEntry.prop)
+        if selectionProp then
+            selectionProp.displayName = selectionProp.displayName
+                or (selectedEntry.reward and selectedEntry.reward.displayName)
+                or selectedEntry.label
+            selectionProp.label = selectionProp.label or selectedEntry.label
+        end
+
         local crateInfo = {
             type = 'crate',
             crateLabel = rewardData.crateLabel or rewardData.label or 'Skrzynia',
@@ -570,7 +587,7 @@ local function processReward(xPlayer, rewardData)
                 label = selectedEntry.label,
                 icon = selectedEntry.icon,
                 rarity = selectedEntry.rarity,
-                prop = sanitizeCrateProp(selectedEntry.prop),
+                prop = selectionProp,
                 rewardType = nestedInfo and nestedInfo.rewardType or (selectedEntry.reward and selectedEntry.reward.type),
                 rewardDetails = nestedInfo,
                 displayName = (selectedEntry.reward and selectedEntry.reward.displayName)

@@ -16,6 +16,5 @@ ui_page 'nui/index.html'
 files {
     'nui/index.html',
     'nui/style.css',
-    'nui/script.js',
-    'nui/images/props/*.svg'
+    'nui/script.js'
 }
