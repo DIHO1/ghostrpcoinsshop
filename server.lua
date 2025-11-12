@@ -343,11 +343,8 @@ local function giveDirectReward(xPlayer, rewardData)
             local source = xPlayer.source
 
             if hasOxInventory() then
-                local ok, added = pcall(function()
-                    return exports.ox_inventory:AddItem(source, itemName, count, metadata)
-                end)
-
-                if not ok or not added then
+                local added = exports.ox_inventory:AddItem(source, itemName, count, metadata)
+                if not added then
                     return false, 'inventory_full'
                 end
             else
@@ -355,14 +352,7 @@ local function giveDirectReward(xPlayer, rewardData)
                     return false, 'inventory_full'
                 end
 
-                local ok, err = pcall(function()
-                    xPlayer.addInventoryItem(itemName, count)
-                end)
-
-                if not ok then
-                    print(('^1[Ghost Market]^7 Nie można dodać przedmiotu %s: %s'):format(itemName, err or 'nieznany błąd'))
-                    return false, 'invalid_item'
-                end
+                xPlayer.addInventoryItem(itemName, count)
             end
 
             return true, {
@@ -956,7 +946,8 @@ RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
                         rarity = selectedEntry.rarity,
                         prop = selectionProp,
                         rewardType = selectedEntry.reward.type,
-                        displayName = selectedEntry.reward.displayName
+                        displayName = selectedEntry.reward.displayName,
+                        rewardDetails = selectedEntry.reward
                     },
                     poolPreview = sanitizedPool
                 }
