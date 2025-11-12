@@ -369,7 +369,8 @@ local function giveDirectReward(xPlayer, rewardData)
                 item = itemName,
                 count = count,
                 metadata = metadata,
-                displayName = rewardData.displayName or itemName
+                displayName = rewardData.displayName or itemName,
+                worldModel = rewardData.worldModel
             }
         end
         return false, 'invalid_item'
@@ -390,7 +391,8 @@ local function giveDirectReward(xPlayer, rewardData)
             rewardType = 'money',
             amount = amount,
             account = account,
-            displayName = rewardData.displayName or ('%s %s'):format(amount, account)
+            displayName = rewardData.displayName or ('%s %s'):format(amount, account),
+            worldModel = rewardData.worldModel
         }
     elseif rewardType == 'group' then
         if rewardData.group then
@@ -400,7 +402,8 @@ local function giveDirectReward(xPlayer, rewardData)
                 return true, {
                     rewardType = 'group',
                     group = rewardData.group,
-                    displayName = rewardData.displayName or rewardData.group
+                    displayName = rewardData.displayName or rewardData.group,
+                    worldModel = rewardData.worldModel
                 }
             end
         end
@@ -411,7 +414,8 @@ local function giveDirectReward(xPlayer, rewardData)
         return true, {
             rewardType = 'vehicle',
             model = rewardData.model,
-            displayName = rewardData.displayName or rewardData.model
+            displayName = rewardData.displayName or rewardData.model,
+            worldModel = rewardData.worldModel or rewardData.model
         }
     elseif rewardType == 'weapon' then
         if rewardData.weapon then
@@ -421,7 +425,8 @@ local function giveDirectReward(xPlayer, rewardData)
                 rewardType = 'weapon',
                 weapon = rewardData.weapon,
                 ammo = ammo,
-                displayName = rewardData.displayName or rewardData.weapon
+                displayName = rewardData.displayName or rewardData.weapon,
+                worldModel = rewardData.worldModel
             }
         end
         return false, 'invalid_weapon'
@@ -455,7 +460,8 @@ local function giveDirectReward(xPlayer, rewardData)
             rewardType = 'ammo',
             weapon = weaponName,
             ammo = ammo,
-            displayName = rewardData.displayName or weaponName
+            displayName = rewardData.displayName or weaponName,
+            worldModel = rewardData.worldModel
         }
     end
 
@@ -489,6 +495,20 @@ local function selectCrateEntry(pool)
     return pool[#pool]
 end
 
+local function sanitizeCrateProp(prop)
+    if type(prop) ~= 'table' then
+        return nil
+    end
+
+    return {
+        icon = prop.icon,
+        color = prop.color,
+        image = prop.image,
+        model = prop.model,
+        worldModel = prop.worldModel or prop.model
+    }
+end
+
 local function sanitizeCrateEntry(entry)
     if type(entry) ~= 'table' then
         return nil
@@ -499,7 +519,7 @@ local function sanitizeCrateEntry(entry)
         label = entry.label,
         icon = entry.icon,
         rarity = entry.rarity,
-        prop = entry.prop
+        prop = sanitizeCrateProp(entry.prop)
     }
 end
 
@@ -550,7 +570,7 @@ local function processReward(xPlayer, rewardData)
                 label = selectedEntry.label,
                 icon = selectedEntry.icon,
                 rarity = selectedEntry.rarity,
-                prop = selectedEntry.prop,
+                prop = sanitizeCrateProp(selectedEntry.prop),
                 rewardType = nestedInfo and nestedInfo.rewardType or (selectedEntry.reward and selectedEntry.reward.type),
                 rewardDetails = nestedInfo,
                 displayName = (selectedEntry.reward and selectedEntry.reward.displayName)

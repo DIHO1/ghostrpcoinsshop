@@ -821,11 +821,18 @@ function resetCrateOverlay() {
 }
 
 function closeCrateOverlay() {
+    const wasVisible = crateOverlay && !crateOverlay.classList.contains('hidden');
     const rewardLabel = crateRewardLabel ? crateRewardLabel.textContent : '';
     const summaryVisible = crateSummary && crateSummary.classList.contains('visible');
     resetCrateOverlay();
     if (!summaryVisible && rewardLabel) {
         addActivityEntry(`🎉 ${rewardLabel}`, true);
+    }
+    if (wasVisible) {
+        fetch(`https://${GetParentResourceName()}/crateClosed`, {
+            method: 'POST',
+            body: JSON.stringify({})
+        });
     }
 }
 

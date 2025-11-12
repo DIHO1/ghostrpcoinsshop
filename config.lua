@@ -91,12 +91,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚗',
                                 color = '#62f6ff',
-                                image = 'images/props/vehicle_specter.svg'
+                                image = 'images/props/vehicle_specter.svg',
+                                model = 'specter'
                             },
                             reward = {
                                 type = 'vehicle',
                                 model = 'specter',
                                 displayName = 'Specter-X',
+                                worldModel = 'specter',
                                 props = {
                                     colorPrimary = 147,
                                     colorSecondary = 12,
@@ -114,13 +116,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '⚡',
                                 color = '#ae74ff',
-                                image = 'images/props/item_nitro.svg'
+                                image = 'images/props/item_nitro.svg',
+                                model = 'prop_ld_jerrycan_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'nitro',
                                 count = 2,
-                                displayName = 'Quantum Nitro'
+                                displayName = 'Quantum Nitro',
+                                worldModel = 'prop_ld_jerrycan_01'
                             }
                         },
                         {
@@ -132,13 +136,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '💰',
                                 color = '#ffd66b',
-                                image = 'images/props/cash_grant.svg'
+                                image = 'images/props/cash_grant.svg',
+                                model = 'prop_cash_case_01'
                             },
                             reward = {
                                 type = 'money',
                                 account = 'money',
                                 amount = 75000,
-                                displayName = '75 000$ grant'
+                                displayName = '75 000$ grant',
+                                worldModel = 'prop_cash_case_01'
                             }
                         },
                         {
@@ -150,12 +156,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🛰️',
                                 color = '#6afff2',
-                                image = 'images/props/group_overseer.svg'
+                                  image = 'images/props/group_overseer.svg',
+                                model = 'prop_ld_keypad_01'
                             },
                             reward = {
                                 type = 'group',
                                 group = 'ghost.overseer',
-                                displayName = 'Uprawnienia Overseer'
+                                  displayName = 'Uprawnienia Overseer',
+                                worldModel = 'prop_ld_keypad_01'
                             }
                         },
                         {
@@ -167,13 +175,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '📦',
                                 color = '#6da9ff',
-                                image = 'images/props/item_materials.svg'
+                                image = 'images/props/item_materials.svg',
+                                model = 'prop_boxpile_07d'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'metalscrap',
                                 count = 20,
-                                displayName = 'Pakiet materiałów'
+                                displayName = 'Pakiet materiałów',
+                                worldModel = 'prop_boxpile_07d'
                             }
                         },
                         {
@@ -185,13 +195,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '💎',
                                 color = '#29f1ff',
-                                image = 'images/props/cash_tokens.svg'
+                                image = 'images/props/cash_tokens.svg',
+                                model = 'prop_cash_pile_02'
                             },
                             reward = {
                                 type = 'money',
                                 account = 'money',
                                 amount = 40000,
-                                displayName = '40 000$ Ghost'
+                                displayName = '40 000$ Ghost',
+                                worldModel = 'prop_cash_pile_02'
                             }
                         }
                     }
@@ -226,13 +238,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🧥',
                                 color = '#f86bff',
-                                image = 'images/props/item_ghost_suit.svg'
+                                image = 'images/props/item_ghost_suit.svg',
+                                model = 'prop_ld_suitcase_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'ghost_suit',
                                 count = 1,
-                                displayName = 'Kombinezon Ghost Prime'
+                                displayName = 'Kombinezon Ghost Prime',
+                                worldModel = 'prop_ld_suitcase_01'
                             }
                         },
                         {
@@ -244,12 +258,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '💳',
                                 color = '#7dffb3',
-                                image = 'images/props/group_vip.svg'
+                                image = 'images/props/group_vip.svg',
+                                model = 'prop_ld_wallet_01'
                             },
                             reward = {
                                 type = 'group',
                                 group = 'ghost.vip',
-                                displayName = 'Ranga VIP'
+                                displayName = 'Ranga VIP',
+                                worldModel = 'prop_ld_wallet_01'
                             }
                         },
                         {
@@ -267,7 +283,8 @@ Config.Catalog = {
                                 type = 'money',
                                 account = 'money',
                                 amount = 120000,
-                                displayName = '120 000$ Ghost'
+                                displayName = '120 000$ Ghost',
+                                worldModel = 'prop_cash_crate_01'
                             }
                         },
                         {
@@ -279,12 +296,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚘',
                                 color = '#62f6ff',
-                                image = 'images/props/vehicle_elegy.svg'
+                                image = 'images/props/vehicle_elegy.svg',
+                                model = 'elegy'
                             },
                             reward = {
                                 type = 'vehicle',
                                 model = 'elegy',
                                 displayName = 'Elegy Retro Custom',
+                                worldModel = 'elegy',
                                 props = {
                                     colorPrimary = 145,
                                     colorSecondary = 13,
@@ -301,13 +320,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🖼️',
                                 color = '#ffb76b',
-                                image = 'images/props/item_holo_art.svg'
+                                image = 'images/props/item_holo_art.svg',
+                                model = 'prop_painting_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'art_holo',
                                 count = 1,
-                                displayName = 'Holograficzny obraz'
+                                displayName = 'Holograficzny obraz',
+                                worldModel = 'prop_painting_01'
                             }
                         },
                         {
@@ -319,13 +340,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎟️',
                                 color = '#8e9cff',
-                                image = 'images/props/item_event_token.svg'
+                                image = 'images/props/item_event_token.svg',
+                                model = 'prop_ld_wallet_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'event_token',
                                 count = 3,
-                                displayName = 'Token Eventowy'
+                                displayName = 'Token Eventowy',
+                                worldModel = 'prop_ld_wallet_01'
                             }
                         }
                     }
@@ -361,6 +384,7 @@ Config.Catalog = {
                     type = 'vehicle',
                     model = 'specter',
                     displayName = 'Specter-X',
+                    worldModel = 'specter',
                     props = {
                         colorPrimary = 12,
                         colorSecondary = 120,
@@ -386,6 +410,7 @@ Config.Catalog = {
                     type = 'vehicle',
                     model = 'paragon',
                     displayName = 'Paragon R',
+                    worldModel = 'paragon',
                     props = {
                         colorPrimary = 29,
                         colorSecondary = 111
@@ -433,12 +458,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🏎️',
                                 color = '#7dffb3',
-                                image = 'images/props/vehicle_paragon.svg'
+                                image = 'images/props/vehicle_paragon.svg',
+                                model = 'paragon'
                             },
                             reward = {
                                 type = 'vehicle',
                                 model = 'paragon',
-                                displayName = 'Paragon R'
+                                displayName = 'Paragon R',
+                                worldModel = 'paragon'
                             }
                         },
                         {
@@ -450,12 +477,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🚘',
                                 color = '#62d4ff',
-                                image = 'images/props/vehicle_comet.svg'
+                                image = 'images/props/vehicle_comet.svg',
+                                model = 'comet5'
                             },
                             reward = {
                                 type = 'vehicle',
                                 model = 'comet5',
-                                displayName = 'Comet SR'
+                                displayName = 'Comet SR',
+                                worldModel = 'comet5'
                             }
                         },
                         {
@@ -467,13 +496,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🛞',
                                 color = '#ffcf6d',
-                                image = 'images/props/item_drift_kit.svg'
+                                image = 'images/props/item_drift_kit.svg',
+                                model = 'prop_carcreeper'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'driftkit',
                                 count = 1,
-                                displayName = 'Zestaw driftowy'
+                                displayName = 'Zestaw driftowy',
+                                worldModel = 'prop_carcreeper'
                             }
                         },
                         {
@@ -485,13 +516,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '⛽',
                                 color = '#7aa9ff',
-                                image = 'images/props/item_fuel.svg'
+                                image = 'images/props/item_fuel.svg',
+                                model = 'prop_ld_jerrycan_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'fuel',
                                 count = 5,
-                                displayName = 'Bony paliwowe'
+                                displayName = 'Bony paliwowe',
+                                worldModel = 'prop_ld_jerrycan_01'
                             }
                         },
                         {
@@ -503,13 +536,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '💵',
                                 color = '#7cffd7',
-                                image = 'images/props/cash_garage.svg'
+                                image = 'images/props/cash_garage.svg',
+                                model = 'prop_cash_case_02'
                             },
                             reward = {
                                 type = 'money',
                                 account = 'money',
                                 amount = 60000,
-                                displayName = '60 000$ garaż'
+                                displayName = '60 000$ garaż',
+                                worldModel = 'prop_cash_case_02'
                             }
                         }
                     }
@@ -544,13 +579,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🔧',
                                 color = '#ff9f68',
-                                image = 'images/props/weapon_pistol_mk2.svg'
+                                image = 'images/props/weapon_pistol_mk2.svg',
+                                model = 'w_pi_pistolmk2'
                             },
                             reward = {
                                 type = 'weapon',
                                 weapon = 'weapon_pistol_mk2',
                                 ammo = 160,
-                                displayName = 'Pistolet MK II'
+                                displayName = 'Pistolet MK II',
+                                worldModel = 'w_pi_pistolmk2'
                             }
                         },
                         {
@@ -562,13 +599,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '💥',
                                 color = '#ffc86b',
-                                image = 'images/props/weapon_heavypistol.svg'
+                                image = 'images/props/weapon_heavypistol.svg',
+                                model = 'w_pi_heavypistol'
                             },
                             reward = {
                                 type = 'weapon',
                                 weapon = 'weapon_heavypistol',
                                 ammo = 120,
-                                displayName = 'Heavy Pistol'
+                                displayName = 'Heavy Pistol',
+                                worldModel = 'w_pi_heavypistol'
                             }
                         },
                         {
@@ -580,13 +619,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🕵️',
                                 color = '#9c8cff',
-                                image = 'images/props/weapon_snspistol.svg'
+                                image = 'images/props/weapon_snspistol.svg',
+                                model = 'w_pi_sns_pistol'
                             },
                             reward = {
                                 type = 'weapon',
                                 weapon = 'weapon_snspistol',
                                 ammo = 80,
-                                displayName = 'SNS Pistol'
+                                displayName = 'SNS Pistol',
+                                worldModel = 'w_pi_sns_pistol'
                             }
                         },
                         {
@@ -598,13 +639,15 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎯',
                                 color = '#6da9ff',
-                                image = 'images/props/item_ammo.svg'
+                                image = 'images/props/item_ammo.svg',
+                                model = 'prop_ld_ammo_pack_01'
                             },
                             reward = {
                                 type = 'item',
                                 item = 'ammo-9mm',
                                 count = 50,
-                                displayName = 'Amunicja 9mm'
+                                displayName = 'Amunicja 9mm',
+                                worldModel = 'prop_ld_ammo_pack_01'
                             }
                         },
                         {
@@ -616,12 +659,14 @@ Config.Catalog = {
                             prop = {
                                 icon = '🎖️',
                                 color = '#ff6db8',
-                                image = 'images/props/group_weapon.svg'
+                                image = 'images/props/group_weapon.svg',
+                                model = 'prop_ld_keypad_01'
                             },
                             reward = {
                                 type = 'group',
                                 group = 'ghost.weapons',
-                                displayName = 'Uprawnienia bojowe'
+                                displayName = 'Uprawnienia bojowe',
+                                worldModel = 'prop_ld_keypad_01'
                             }
                         }
                     }
@@ -656,7 +701,8 @@ Config.Catalog = {
                     type = 'item',
                     item = 'medikit',
                     count = 1,
-                    displayName = 'Quantum Medkit'
+                    displayName = 'Quantum Medkit',
+                    worldModel = 'prop_ld_health_pack'
                 }
             },
             {
@@ -676,7 +722,8 @@ Config.Catalog = {
                     type = 'money',
                     account = 'money',
                     amount = 50000,
-                    displayName = '50 000$ gotówki'
+                    displayName = '50 000$ gotówki',
+                    worldModel = 'prop_cash_case_01'
                 }
             },
             {
@@ -696,7 +743,8 @@ Config.Catalog = {
                     type = 'money',
                     account = 'black_money',
                     amount = 35000,
-                    displayName = '35 000$ brudnej gotówki'
+                    displayName = '35 000$ brudnej gotówki',
+                    worldModel = 'prop_cash_case_02'
                 }
             }
         }
@@ -726,7 +774,8 @@ Config.Catalog = {
                 rewardData = {
                     type = 'group',
                     group = 'ghost.overseer',
-                    displayName = 'Ranga Ghost Overseer'
+                    displayName = 'Ranga Ghost Overseer',
+                    worldModel = 'prop_ld_keypad_01'
                 }
             }
         }
