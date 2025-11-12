@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Ghost Market</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-filter"></div>
+    <div id="app" class="market hidden">
+        <header class="market-topbar">
+            <div class="topbar-left">
+                <div class="brand">
+                    <span class="brand-logo">Ghost<span>Market</span></span>
+                    <span class="brand-tag">Premium Storefront</span>
+                </div>
+                <nav class="primary-nav">
+                    <button class="nav-link active" data-target="hero">Strona główna</button>
+                    <button class="nav-link" data-target="event_crates">Skrzynki</button>
+                    <button class="nav-link" data-target="vehicles">Pojazdy</button>
+                    <button class="nav-link" data-target="crates">Ruletka</button>
+                    <button class="nav-link" data-target="boosts">Misje</button>
+                    <button class="nav-link" data-target="services">Usługi</button>
+                    <button class="nav-link" data-target="activity">Ranking</button>
+                </nav>
+            </div>
+            <div class="topbar-right">
+                <div class="status-pills">
+                    <span class="status-pill">DMG</span>
+                    <span class="status-pill pill-event">Event</span>
+                    <span class="status-clock" id="statusClock">20:28</span>
+                </div>
+                <div class="wallet" id="walletDisplay">
+                    <span class="wallet-label">Ghost Coins</span>
+                    <span class="wallet-value" id="walletValue">💎 0</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="market-body" id="contentScroll">
+            <section class="hero" id="heroSection">
+                <div class="hero-background"></div>
+                <div class="hero-content">
+                    <div class="hero-copy">
+                        <span class="hero-badge" id="heroBadge">Nowość</span>
+                        <h1 class="hero-title" id="heroTitle">Ghost Market</h1>
+                        <p class="hero-subtitle" id="heroSubtitle">Ekskluzywny sklep premium dla społeczności Ghost.</p>
+                        <div class="hero-actions">
+                            <button class="btn primary" id="heroPrimary">Sprawdź skrzynki</button>
+                            <button class="btn secondary" id="heroSecondary">Kup pojazd</button>
+                        </div>
+                    </div>
+                    <div class="hero-side">
+                        <div class="hero-countdown" id="heroCountdown">Koniec za: --</div>
+                        <div class="hero-featured" id="heroFeatured"></div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="market-sections" id="sectionsRoot"></div>
+
+            <section class="catalog-section activity" data-section="activity">
+                <header>
+                    <h2>Aktywność</h2>
+                    <p class="section-subtitle">Rejestr ostatnich zakupów i nagród Ghost Market.</p>
+                </header>
+                <div class="activity-log" id="activityLog">
+                    <p class="placeholder">Brak ostatnich zakupów. Dokonaj transakcji, aby pojawiły się wpisy.</p>
+                </div>
+            </section>
+        </main>
+
+        <footer class="market-footer">
+            <span>© 2028 Ghost Market. Wszystkie prawa zastrzeżone.</span>
+        </footer>
+    </div>
+
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h2 id="modalTitle">Potwierdzenie zakupu</h2>
+            <p id="modalDescription">Czy na pewno kupić?</p>
+            <div class="modal-actions">
+                <button class="btn primary" id="confirmPurchase">Kup</button>
+                <button class="btn secondary" id="cancelPurchase">Anuluj</button>
+            </div>
+            <p class="modal-feedback" id="modalFeedback"></p>
+        </div>
+    </div>
+
+    <div id="crateOverlay" class="crate-overlay hidden">
+        <div class="crate-screen">
+            <header class="crate-header">
+                <span class="crate-title" id="crateTitle">Skrzynia</span>
+                <button class="crate-close" id="crateClose" aria-label="Zamknij">×</button>
+            </header>
+            <div class="crate-body">
+                <div class="crate-reel" id="crateReel">
+                    <div class="crate-indicator"></div>
+                    <div class="crate-track" id="crateTrack"></div>
+                </div>
+                <p class="crate-world-hint">Spójrz przed siebie — nagroda pojawia się jako prawdziwy model GTA w świecie gry.</p>
+                <div class="crate-summary" id="crateSummary">
+                    <div class="crate-prop" id="crateRewardProp">
+                        <span class="crate-prop-icon" id="cratePropIcon">🎁</span>
+                    </div>
+                    <div class="crate-item-details">
+                        <span class="crate-item-label" id="crateRewardLabel">Nagroda</span>
+                        <span class="crate-item-detail" id="crateRewardDetail"></span>
+                        <span class="crate-item-rarity" id="crateRewardRarity"></span>
+                    </div>
+                    <button class="btn primary" id="crateContinue">Kontynuuj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
