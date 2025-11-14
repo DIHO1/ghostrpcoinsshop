@@ -1,0 +1,17 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'>
+<defs>
+    <linearGradient id='bg' x1='0%' y1='0%' x2='100%' y2='100%'>
+        <stop offset='0%' stop-color='#9c8cff' stop-opacity='0.4'/>
+        <stop offset='100%' stop-color='#9c8cff' stop-opacity='0.85'/>
+    </linearGradient>
+</defs>
+<rect width='400' height='400' rx='48' fill='url(#bg)'/>
+<rect width='400' height='400' rx='48' fill='rgba(4,10,24,0.55)'/>
+<g fill='#9c8cff' transform='translate(60,110)'>
+    <path d='M10 70 H210 L230 30 H130 L120 0 H40 L30 30 H0 Z'/>
+    <rect x='150' y='70' width='70' height='28' rx='6'/>
+    <rect x='60' y='98' width='60' height='110' rx='16'/>
+    <rect x='160' y='118' width='26' height='100' rx='12'/>
+</g>
+<text x='200' y='340' font-family='"Orbitron", "Rajdhani", "Segoe UI", sans-serif' font-size='44' text-anchor='middle' fill='rgba(236,244,255,0.92)'>SNS Pistol</text>
+</svg>
