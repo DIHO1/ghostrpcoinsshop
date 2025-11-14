@@ -28,7 +28,7 @@ add_principal identifier.steam:110000112345678 group.admin   # przypisz konkretn
 Jeżeli zmienisz nazwę flagi w `Config.Admin.requiredAce` lub `Config.EventTimer.requiredAce`, zaktualizuj wpisy ACE odpowiednio. Po starcie zasobu w konsoli pojawią się instrukcje z aktualną nazwą wymaganej flagi.
 
 ## Dostępne komendy
-- `/market` – otwiera tablet Ghost Market (domyślnie również pod klawiszem **F7**).
+- `/sklep` – otwiera tablet Ghost Market (domyślnie również pod klawiszem **F7** / komenda `ghostmarket:tablet`).
 - `/ghostcoins <add|remove|set|show>` – zarządzanie saldem graczy. Wspiera identyfikatory ESX (steam, license) oraz ID gracza na serwerze.
 - `/marketevent <set|show|clear>` – zarządzanie licznikiem wydarzenia widocznym na ekranie startowym tabletu. Komenda przyjmuje formaty czasu typu `2h30m`, `90` (minuty) lub `01:30:00`.
 
