@@ -505,8 +505,8 @@ RegisterCommand(Config.Commands.event, function(source, args)
 
         local minutes
         if durationArg:find('h') or durationArg:find('m') then
-            local hours = tonumber(durationArg:match('(\d+)h')) or 0
-            local mins = tonumber(durationArg:match('(\d+)m')) or 0
+            local hours = tonumber(durationArg:match('(%d+)h')) or 0
+            local mins = tonumber(durationArg:match('(%d+)m')) or 0
             minutes = hours * 60 + mins
         elseif durationArg:find(':') then
             local h, m, s = durationArg:match('(%d+):(%d+):?(%d*)')
