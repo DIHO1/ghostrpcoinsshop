@@ -4,31 +4,39 @@ local isOpen = false
 local hasFocus = false
 local currentBalance = 0
 local currentEventState = {}
-local cratePreview = {
+local worldPreview = {
     entity = nil,
     cam = nil,
     model = nil,
-    type = nil
+    type = nil,
+    priority = 0
 }
 
-local function cleanupCratePreview()
-    if cratePreview.cam then
+local function cleanupWorldPreview(force)
+    if not force and worldPreview.type == 'crate' then
+        return
+    end
+
+    if worldPreview.cam then
         RenderScriptCams(false, true, 500, true, true)
-        DestroyCam(cratePreview.cam, false)
-        cratePreview.cam = nil
+        DestroyCam(worldPreview.cam, false)
+        worldPreview.cam = nil
     end
 
-    if cratePreview.entity and DoesEntityExist(cratePreview.entity) then
-        DeleteEntity(cratePreview.entity)
+    if worldPreview.entity and DoesEntityExist(worldPreview.entity) then
+        DeleteEntity(worldPreview.entity)
     end
 
-    if cratePreview.model then
-        SetModelAsNoLongerNeeded(cratePreview.model)
+    if worldPreview.model then
+        SetModelAsNoLongerNeeded(worldPreview.model)
     end
 
-    cratePreview.entity = nil
-    cratePreview.model = nil
-    cratePreview.type = nil
+    ClearFocus()
+
+    worldPreview.entity = nil
+    worldPreview.model = nil
+    worldPreview.type = nil
+    worldPreview.priority = 0
 end
 
 local function loadModel(modelName)
@@ -76,40 +84,71 @@ local function determineWeaponModel(weaponName)
     return nil
 end
 
-local function spawnCratePreview(context)
-    cleanupCratePreview()
+local function resolvePreviewModel(rewardType, prop, details)
+    local modelName = nil
 
-    if type(context) ~= 'table' or context.type ~= 'crate' then
-        return
+    if prop then
+        modelName = prop.worldModel or prop.model or prop.vehicleModel or prop.weaponModel
     end
 
-    local selection = context.selection
-    if type(selection) ~= 'table' then
-        return
+    if not modelName and details then
+        modelName = details.worldModel or details.model or details.vehicleModel or details.weaponModel
     end
-
-    local rewardType = selection.rewardType
-    local details = selection.rewardDetails or {}
-    local prop = selection.prop or {}
-
-    if not rewardType and details.rewardType then
-        rewardType = details.rewardType
-    end
-
-    local modelName = prop.worldModel or prop.model or details.worldModel
 
     if rewardType == 'vehicle' then
-        modelName = modelName or details.model or prop.model
-    elseif rewardType == 'weapon' then
-        modelName = modelName or prop.weaponModel
-        if not modelName and details.weapon then
+        modelName = modelName or (details and details.model) or (prop and prop.model)
+    elseif rewardType == 'weapon' or rewardType == 'ammo' then
+        modelName = modelName or (prop and prop.weaponModel)
+        if not modelName and details and details.weapon then
             modelName = determineWeaponModel(details.weapon)
         end
-    elseif rewardType == 'ammo' then
-        modelName = modelName or prop.weaponModel
-        if not modelName and details.weapon then
-            modelName = determineWeaponModel(details.weapon)
+    end
+
+    return modelName
+end
+
+local function spawnWorldPreview(context, priority)
+    if type(context) ~= 'table' then
+        return
+    end
+
+    priority = priority or 10
+
+    if worldPreview.priority > 0 and priority < worldPreview.priority then
+        return
+    end
+
+    cleanupWorldPreview(true)
+
+    local previewType = context.previewType or context.type or 'item'
+
+    local rewardType = context.rewardType
+    local details = context.rewardDetails or context.rewardData or {}
+    local prop = context.prop or {}
+    local selection = context.selection
+
+    if not rewardType and selection then
+        rewardType = selection.rewardType or (selection.rewardDetails and selection.rewardDetails.rewardType)
+        if not details or next(details) == nil then
+            details = selection.rewardDetails or {}
         end
+        if (not prop or next(prop) == nil) and selection.prop then
+            prop = selection.prop
+        end
+    end
+
+    if not rewardType and details and details.type then
+        rewardType = details.type
+    end
+
+    if previewType == 'crate' and not rewardType then
+        rewardType = 'crate'
+    end
+
+    local modelName = resolvePreviewModel(rewardType, prop, details)
+
+    if not modelName and rewardType == 'crate' and details and details.model then
+        modelName = details.model
     end
 
     if not modelName then
@@ -157,6 +196,7 @@ local function spawnCratePreview(context)
     if isVehicle then
         entity = CreateVehicle(modelHash, spawnCoords.x, spawnCoords.y, spawnCoords.z, heading, false, false)
         if entity ~= 0 then
+            SetEntityAsMissionEntity(entity, true, true)
             SetVehicleOnGroundProperly(entity)
             SetVehicleEngineOn(entity, false, true, false)
             SetVehicleDoorsLocked(entity, 4)
@@ -165,6 +205,7 @@ local function spawnCratePreview(context)
     else
         entity = CreateObject(modelHash, spawnCoords.x, spawnCoords.y, spawnCoords.z, false, false, false)
         if entity ~= 0 then
+            SetEntityAsMissionEntity(entity, true, true)
             SetEntityCollision(entity, false, false)
         end
     end
@@ -177,11 +218,14 @@ local function spawnCratePreview(context)
     FreezeEntityPosition(entity, true)
     SetEntityInvincible(entity, true)
 
-    cratePreview.entity = entity
-    cratePreview.model = modelHash
-    cratePreview.type = rewardType
+    worldPreview.entity = entity
+    worldPreview.model = modelHash
+    worldPreview.type = previewType or rewardType
+    worldPreview.priority = priority
 
     local cam = CreateCam('DEFAULT_SCRIPTED_CAMERA', true)
+    SetCamActive(cam, true)
+    SetCamFov(cam, rewardType == 'vehicle' and 55.0 or 60.0)
     local camCoords = vector3(
         spawnCoords.x - forward.x * camDistance,
         spawnCoords.y - forward.y * camDistance,
@@ -190,77 +234,26 @@ local function spawnCratePreview(context)
 
     SetCamCoord(cam, camCoords.x, camCoords.y, camCoords.z)
     PointCamAtCoord(cam, spawnCoords.x, spawnCoords.y, spawnCoords.z + (rewardType == 'vehicle' and 0.5 or 0.2))
+    SetFocusPosAndVel(spawnCoords.x, spawnCoords.y, spawnCoords.z, 0.0, 0.0, 0.0)
     RenderScriptCams(true, true, 500, true, true)
 
-    cratePreview.cam = cam
+    worldPreview.cam = cam
 
     CreateThread(function()
-        if not cratePreview or not cratePreview.entity or not DoesEntityExist(entity) then return end
-
-        local startTime = GetGameTimer()
-        local duration = 10000 -- 10 seconds
-        local endTime = startTime + duration
-
-        local initialHeading = GetEntityHeading(entity)
-        local totalRotation = 720.0 -- Two full rotations
-
-        local pointAtOffset = rewardType == 'vehicle' and 0.5 or 0.2
-
-        local pedForward = GetEntityForwardVector(PlayerPedId())
-        local rightVector = vector3(pedForward.y, -pedForward.x, 0)
-
-        while GetGameTimer() < endTime do
-            if not cratePreview or cratePreview.entity ~= entity or not DoesEntityExist(entity) then
-                break
+        local angle = heading
+        while worldPreview.entity == entity do
+            angle = angle + 0.25
+            if angle >= 360.0 then
+                angle = angle - 360.0
             end
 
-            local elapsed = GetGameTimer() - startTime
-            local progress = elapsed / duration -- 0.0 to 1.0
-            local easedProgress = -0.5 * (math.cos(math.pi * progress) - 1)
-
-            -- Rotate entity
-            local currentRotation = initialHeading + totalRotation * easedProgress
             if IsEntityAVehicle(entity) then
-                SetEntityHeading(entity, currentRotation)
+                SetEntityHeading(entity, angle)
             else
-                SetEntityRotation(entity, 0.0, 0.0, currentRotation, 2, true)
+                SetEntityRotation(entity, 0.0, 0.0, angle, 2, true)
             end
-
-            -- Animate camera
-            local orbitAngle = math.rad(180 * easedProgress) -- Orbit 180 degrees
-            local currentDistance = camDistance + 1.5 - (1.5 * easedProgress) -- Zoom in
-            local currentHeight = camHeight - 0.5 + (0.5 * easedProgress) -- Rise up
-
-            local camOffsetX = -pedForward.x * math.cos(orbitAngle) + rightVector.x * math.sin(orbitAngle)
-            local camOffsetY = -pedForward.y * math.cos(orbitAngle) + rightVector.y * math.sin(orbitAngle)
-
-            local camX = spawnCoords.x + camOffsetX * currentDistance
-            local camY = spawnCoords.y + camOffsetY * currentDistance
-
-            SetCamCoord(cam, camX, camY, spawnCoords.z + currentHeight)
-            PointCamAtCoord(cam, spawnCoords.x, spawnCoords.y, spawnCoords.z + pointAtOffset)
 
             Wait(0)
-        end
-
-        if cratePreview and cratePreview.entity == entity and DoesEntityExist(entity) then
-            -- Set final state
-            local finalRotation = initialHeading + totalRotation
-            if IsEntityAVehicle(entity) then
-                SetEntityHeading(entity, finalRotation)
-            else
-                SetEntityRotation(entity, 0.0, 0.0, finalRotation, 2, true)
-            end
-
-            local finalOrbitAngle = math.rad(180)
-            local finalCamOffsetX = -pedForward.x * math.cos(finalOrbitAngle) + rightVector.x * math.sin(finalOrbitAngle)
-            local finalCamOffsetY = -pedForward.y * math.cos(finalOrbitAngle) + rightVector.y * math.sin(finalOrbitAngle)
-
-            local finalCamX = spawnCoords.x + finalCamOffsetX * camDistance
-            local finalCamY = spawnCoords.y + finalCamOffsetY * camDistance
-
-            SetCamCoord(cam, finalCamX, finalCamY, spawnCoords.z + camHeight)
-            PointCamAtCoord(cam, spawnCoords.x, spawnCoords.y, spawnCoords.z + pointAtOffset)
         end
     end)
 
@@ -341,7 +334,7 @@ local function closeMarket()
     if not isOpen then return end
 
     isOpen = false
-    cleanupCratePreview()
+    cleanupWorldPreview(true)
     toggleFocus(false)
 
     SendNUIMessage({
@@ -363,8 +356,47 @@ RegisterNUICallback('closeMarket', function(_, cb)
 end)
 
 RegisterNUICallback('crateClosed', function(_, cb)
-    cleanupCratePreview()
+    cleanupWorldPreview(true)
     cb('ok')
+end)
+
+RegisterNUICallback('previewItem', function(data, cb)
+    cb('ok')
+
+    if not isOpen then
+        cleanupWorldPreview(true)
+        return
+    end
+
+    if type(data) ~= 'table' then
+        return
+    end
+
+    local enabled = data.enabled
+
+    if type(enabled) == 'string' then
+        enabled = enabled == '1' or enabled == 'true'
+    end
+
+    if not enabled then
+        if worldPreview.type ~= 'crate' then
+            cleanupWorldPreview(true)
+        end
+        return
+    end
+
+    local context = data.context
+    if type(context) ~= 'table' then
+        return
+    end
+
+    local priority = tonumber(data.priority) or 10
+
+    if (context.previewType or context.type) == 'crate' then
+        priority = math.max(priority, 50)
+    end
+
+    spawnWorldPreview(context, priority)
 end)
 
 RegisterNUICallback('purchaseItem', function(data, cb)
@@ -374,13 +406,6 @@ RegisterNUICallback('purchaseItem', function(data, cb)
     end
 
     TriggerServerEvent('ghostmarket:purchaseItem', data.id)
-    cb('ok')
-end)
-
-RegisterNUICallback('claimReward', function(data, cb)
-    if data and data.rewardId then
-        TriggerServerEvent('ghostmarket:claimReward', data.rewardId)
-    end
     cb('ok')
 end)
 
@@ -414,9 +439,9 @@ RegisterNetEvent('ghostmarket:purchaseResult', function(result)
     end
 
     if result and result.rewardContext and result.rewardContext.type == 'crate' then
-        spawnCratePreview(result.rewardContext)
+        spawnWorldPreview(result.rewardContext, 100)
     else
-        cleanupCratePreview()
+        cleanupWorldPreview(false)
     end
 
     SendNUIMessage({
@@ -465,7 +490,7 @@ AddEventHandler('onResourceStop', function(resourceName)
     if hasFocus or isOpen then
         toggleFocus(false)
     end
-    cleanupCratePreview()
+    cleanupWorldPreview(true)
 end)
 
 RegisterKeyMapping(Config.OpenCommand, 'Otwórz Ghost Market', 'keyboard', 'F7')

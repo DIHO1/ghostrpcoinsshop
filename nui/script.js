@@ -14,6 +14,10 @@ const state = {
     statusClockTimer: null
 };
 
+const RESOURCE_NAME = typeof GetParentResourceName === 'function'
+    ? GetParentResourceName()
+    : 'market';
+
 const app = document.getElementById('app');
 const sectionsRoot = document.getElementById('sectionsRoot');
 const walletValue = document.getElementById('walletValue');
@@ -48,6 +52,11 @@ const crateRewardDetail = document.getElementById('crateRewardDetail');
 const crateRewardRarity = document.getElementById('crateRewardRarity');
 const crateContinue = document.getElementById('crateContinue');
 const crateClose = document.getElementById('crateClose');
+
+const previewState = {
+    activeId: null,
+    suspended: false
+};
 
 function formatPrice(amount) {
     const numeric = typeof amount === 'number' ? amount : Number(amount) || 0;
@@ -108,6 +117,153 @@ function normalizeVisualType(type) {
     const normalized = type.trim().toLowerCase();
     const allowed = ['vehicle', 'weapon', 'crate', 'boost', 'service'];
     return allowed.includes(normalized) ? normalized : '';
+}
+
+function normalizeProp(prop) {
+    if (!prop || typeof prop !== 'object') {
+        return null;
+    }
+
+    const allowedKeys = [
+        'icon',
+        'color',
+        'model',
+        'worldModel',
+        'vehicleModel',
+        'weaponModel',
+        'displayName',
+        'label'
+    ];
+
+    const normalized = {};
+
+    allowedKeys.forEach((key) => {
+        if (Object.prototype.hasOwnProperty.call(prop, key) && prop[key] != null) {
+            normalized[key] = prop[key];
+        }
+    });
+
+    return Object.keys(normalized).length > 0 ? normalized : null;
+}
+
+function buildPreviewContext(item) {
+    if (!item || typeof item !== 'object') {
+        return null;
+    }
+
+    const rewardData = item.rewardData || {};
+    const baseType = rewardData.type || item.type || (item.visual && item.visual.type) || 'item';
+    const context = {
+        previewType: baseType,
+        rewardType: rewardData.type || item.type,
+        prop: normalizeProp(item.prop || rewardData.prop),
+        rewardData: {}
+    };
+
+    if (!context.prop && rewardData.prop) {
+        context.prop = normalizeProp(rewardData.prop);
+    }
+
+    if (baseType === 'crate' || context.rewardType === 'crate') {
+        context.previewType = 'crate';
+        context.rewardType = 'crate';
+        const crateModel = rewardData.model
+            || rewardData.worldModel
+            || (context.prop && (context.prop.worldModel || context.prop.model))
+            || 'prop_box_wood02a';
+
+        context.rewardData = {
+            type: 'crate',
+            model: crateModel,
+            worldModel: crateModel
+        };
+
+        if (!context.prop) {
+            context.prop = normalizeProp({ model: crateModel, worldModel: crateModel });
+        }
+
+        return context;
+    }
+
+    if (context.rewardType === 'vehicle') {
+        context.rewardData.model = rewardData.model
+            || rewardData.vehicleModel
+            || rewardData.vehicle
+            || rewardData.worldModel
+            || (context.prop && (context.prop.vehicleModel || context.prop.model));
+    } else if (context.rewardType === 'weapon') {
+        context.rewardData.weapon = rewardData.weapon;
+        context.rewardData.worldModel = rewardData.worldModel
+            || (context.prop && (context.prop.weaponModel || context.prop.model));
+    } else if (context.rewardType === 'ammo') {
+        context.rewardData.weapon = rewardData.weapon;
+        context.rewardData.worldModel = rewardData.worldModel
+            || (context.prop && (context.prop.weaponModel || context.prop.model));
+    } else {
+        context.rewardData.worldModel = rewardData.worldModel || rewardData.model;
+    }
+
+    return context;
+}
+
+function sendPreviewRequest(item, enabled, priority) {
+    if (!enabled) {
+        if (previewState.suspended) {
+            previewState.activeId = null;
+            return;
+        }
+
+        if (item && item.id && previewState.activeId && previewState.activeId !== item.id) {
+            return;
+        }
+
+        if (!previewState.activeId) {
+            return;
+        }
+
+        previewState.activeId = null;
+
+        fetch(`https://${RESOURCE_NAME}/previewItem`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json; charset=UTF-8'
+            },
+            body: JSON.stringify({ enabled: false })
+        }).catch(() => {});
+
+        return;
+    }
+
+    if (previewState.suspended) {
+        return;
+    }
+
+    if (!item || typeof item !== 'object') {
+        return;
+    }
+
+    if (previewState.activeId === item.id) {
+        return;
+    }
+
+    const context = buildPreviewContext(item);
+    if (!context) {
+        return;
+    }
+
+    previewState.activeId = item.id;
+
+    fetch(`https://${RESOURCE_NAME}/previewItem`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: JSON.stringify({
+            enabled: true,
+            context,
+            priority: priority || (context.previewType === 'crate' ? 40 : 12)
+        })
+    }).catch(() => {});
 }
 
 function buildCardPreview(item) {
@@ -316,6 +472,7 @@ function createItemCard(item, variant) {
     const cardVariant = variant || 'grid';
     card.className = `item-card item-card--${cardVariant}`;
     card.dataset.itemId = item.id;
+    card.tabIndex = 0;
 
     if (item.category) {
         card.dataset.category = item.category;
@@ -401,6 +558,15 @@ function createItemCard(item, variant) {
         event.stopPropagation();
         openModal(item);
     });
+
+    const previewPriority = cardVariant === 'hero' ? 24 : cardVariant === 'highlight' ? 18 : 12;
+    const handleEnter = () => sendPreviewRequest(item, true, previewPriority);
+    const handleLeave = () => sendPreviewRequest(item, false);
+
+    card.addEventListener('mouseenter', handleEnter);
+    card.addEventListener('mouseleave', handleLeave);
+    card.addEventListener('focus', handleEnter);
+    card.addEventListener('blur', handleLeave);
 
     return card;
 }
@@ -840,12 +1006,14 @@ function closeCrateOverlay() {
     const wasVisible = crateOverlay && !crateOverlay.classList.contains('hidden');
     const rewardLabel = crateRewardLabel ? crateRewardLabel.textContent : '';
     const summaryVisible = crateSummary && crateSummary.classList.contains('visible');
+    previewState.suspended = false;
+    sendPreviewRequest(null, false);
     resetCrateOverlay();
     if (!summaryVisible && rewardLabel) {
         addActivityEntry(`🎉 ${rewardLabel}`, true);
     }
     if (wasVisible) {
-        fetch(`https://${GetParentResourceName()}/crateClosed`, {
+        fetch(`https://${RESOURCE_NAME}/crateClosed`, {
             method: 'POST',
             body: JSON.stringify({})
         });
@@ -952,7 +1120,8 @@ function playCrateAnimation(item, context) {
         return;
     }
 
-    state.pendingRewardId = context.pendingId || null;
+    previewState.suspended = true;
+    previewState.activeId = null;
 
     crateOverlay.classList.remove('hidden');
     crateTitle.textContent = context.crateLabel || item.label || 'Skrzynia';
@@ -1079,16 +1248,6 @@ function playCrateAnimation(item, context) {
             if (crateSummary) {
                 crateSummary.classList.add('visible');
             }
-
-            if (state.pendingRewardId) {
-                fetch(`https://${GetParentResourceName()}/claimReward`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
-                    body: JSON.stringify({ rewardId: state.pendingRewardId })
-                });
-                state.pendingRewardId = null;
-            }
-
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
             state.crateAnimation = null;
         };
@@ -1291,7 +1450,7 @@ if (confirmPurchase) {
             modalFeedback.textContent = 'Przetwarzanie...';
         }
 
-        fetch(`https://${GetParentResourceName()}/purchaseItem`, {
+        fetch(`https://${RESOURCE_NAME}/purchaseItem`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json; charset=UTF-8'
@@ -1336,6 +1495,10 @@ window.addEventListener('message', (event) => {
         state.currency = data.currency || state.currency;
         state.layout = data.layout || state.layout;
 
+        previewState.suspended = false;
+        previewState.activeId = null;
+        sendPreviewRequest(null, false);
+
         document.body.classList.add('market-active');
         if (app) {
             app.classList.remove('hidden');
@@ -1360,6 +1523,9 @@ window.addEventListener('message', (event) => {
     }
 
     if (action === 'close') {
+        previewState.suspended = false;
+        previewState.activeId = null;
+        sendPreviewRequest(null, false);
         if (app) {
             app.classList.add('hidden');
         }
@@ -1392,6 +1558,7 @@ window.addEventListener('message', (event) => {
     }
 
     if (action === 'purchaseResult') {
+        sendPreviewRequest(null, false);
         const result = data.result || {};
         if (typeof result.balance === 'number') {
             setWallet(result.balance);
@@ -1453,7 +1620,7 @@ window.addEventListener('keydown', (event) => {
             closeCrateOverlay();
             return;
         }
-        fetch(`https://${GetParentResourceName()}/closeMarket`, {
+        fetch(`https://${RESOURCE_NAME}/closeMarket`, {
             method: 'POST',
             body: JSON.stringify({})
         });
@@ -1461,7 +1628,7 @@ window.addEventListener('keydown', (event) => {
 });
 
 window.addEventListener('load', () => {
-    fetch(`https://${GetParentResourceName()}/ready`, {
+    fetch(`https://${RESOURCE_NAME}/ready`, {
         method: 'POST',
         body: JSON.stringify({})
     });

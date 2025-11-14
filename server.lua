@@ -15,7 +15,6 @@ else
 end
 
 local purchaseCooldowns = {}
-local pendingRewards = {}
 
 local function hasOxInventory()
     return type(GetResourceState) == 'function' and GetResourceState('ox_inventory') == 'started'
@@ -343,8 +342,11 @@ local function giveDirectReward(xPlayer, rewardData)
             local source = xPlayer.source
 
             if hasOxInventory() then
-                local added = exports.ox_inventory:AddItem(source, itemName, count, metadata)
-                if not added then
+                local ok, added = pcall(function()
+                    return exports.ox_inventory:AddItem(source, itemName, count, metadata)
+                end)
+
+                if not ok or not added then
                     return false, 'inventory_full'
                 end
             else
@@ -352,7 +354,14 @@ local function giveDirectReward(xPlayer, rewardData)
                     return false, 'inventory_full'
                 end
 
-                xPlayer.addInventoryItem(itemName, count)
+                local ok, err = pcall(function()
+                    xPlayer.addInventoryItem(itemName, count)
+                end)
+
+                if not ok then
+                    print(('^1[Ghost Market]^7 Nie można dodać przedmiotu %s: %s'):format(itemName, err or 'nieznany błąd'))
+                    return false, 'invalid_item'
+                end
             end
 
             return true, {
@@ -832,39 +841,6 @@ RegisterNetEvent('ghostmarket:requestEventState', function()
     sendEventState(src)
 end)
 
-local function deliverPendingReward(playerSource, rewardId)
-    local xPlayer = ESX.GetPlayerFromId(playerSource)
-    if not xPlayer then return end
-
-    local identifier = getPlayerIdentifier(xPlayer)
-    if not identifier or not pendingRewards[identifier] or not pendingRewards[identifier][rewardId] then
-        return
-    end
-
-    local rewardData = pendingRewards[identifier][rewardId]
-    pendingRewards[identifier][rewardId] = nil
-
-    local success, rewardDetails = giveDirectReward(xPlayer, rewardData)
-
-    if success then
-        print(('[Ghost Market] Gracz %s (%s) odebrał nagrodę: %s.')
-            :format(xPlayer.getName(), identifier, rewardDetails.displayName or 'nieznana'))
-
-        -- Optionally, send a confirmation to the client
-        -- TriggerClientEvent('ghostmarket:rewardDelivered', playerSource, rewardDetails)
-    else
-        print(('[Ghost Market] Nie udało się dostarczyć oczekującej nagrody dla %s. Powód: %s')
-            :format(identifier, rewardDetails or 'nieznany'))
-
-        -- Optionally, notify the player of the failure
-        -- TriggerClientEvent('ghostmarket:rewardDeliveryFailed', playerSource, { reason = rewardDetails })
-    end
-end
-
-RegisterNetEvent('ghostmarket:claimReward', function(rewardId)
-    deliverPendingReward(source, rewardId)
-end)
-
 RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
     local src = source
     if not ESX then return end
@@ -909,95 +885,37 @@ RegisterNetEvent('ghostmarket:purchaseItem', function(itemId)
                 return
             end
 
-            local rewardData = selectedItem.rewardData
-            local isCrate = rewardData and rewardData.type == 'crate'
+            local rewarded, rewardDetailsOrReason = distributeReward(src, selectedItem.rewardData)
+            if not rewarded then
+                addCoins(identifier, selectedItem.price, function()
+                    getCoins(identifier, function(refundBalance)
+                        TriggerClientEvent('ghostmarket:purchaseResult', src, { success = false, reason = rewardDetailsOrReason or 'reward_failed', balance = refundBalance })
+                    end)
+                end)
+                return
+            end
 
-            if isCrate then
-                local pool = rewardData.pool
-                local selectedEntry = selectCrateEntry(pool)
+            purchaseCooldowns[identifier] = now
 
-                if not selectedEntry or not selectedEntry.reward then
-                    TriggerClientEvent('ghostmarket:purchaseResult', src, { success = false, reason = 'invalid_crate', balance = newBalance })
-                    return
-                end
+            print(('[Ghost Market] Gracz %s (%s) kupił %s za %d %s.')
+                :format(xPlayer.getName(), identifier, selectedItem.label, selectedItem.price, Config.Currency.symbol))
 
-                local pendingId = string.format('%s-%s', identifier, math.random(10000, 99999))
-                if not pendingRewards[identifier] then pendingRewards[identifier] = {} end
-                pendingRewards[identifier][pendingId] = selectedEntry.reward
-
-                local sanitizedPool = sanitizeCratePool(pool)
-                local selectionProp = sanitizeCrateProp(selectedEntry.prop)
-
-                if selectionProp then
-                    selectionProp.displayName = selectionProp.displayName or (selectedEntry.reward and selectedEntry.reward.displayName) or selectedEntry.label
-                    selectionProp.label = selectionProp.label or selectedEntry.label
-                end
-
-                local rewardDetailsOrReason = {
-                    type = 'crate',
-                    pendingId = pendingId,
-                    crateLabel = rewardData.crateLabel or rewardData.label or 'Skrzynia',
-                    animation = rewardData.animation,
-                    highlight = rewardData.highlight,
-                    selection = {
-                        id = selectedEntry.id,
-                        label = selectedEntry.label,
-                        icon = selectedEntry.icon,
-                        rarity = selectedEntry.rarity,
-                        prop = selectionProp,
-                        rewardType = selectedEntry.reward.type,
-                        displayName = selectedEntry.reward.displayName,
-                        rewardDetails = selectedEntry.reward
-                    },
-                    poolPreview = sanitizedPool
-                }
-
-                purchaseCooldowns[identifier] = now
-
-                print(('[Ghost Market] Gracz %s (%s) kupił %s za %d %s.')
-                    :format(xPlayer.getName(), identifier, selectedItem.label, selectedItem.price, Config.Currency.symbol))
-
+            if type(rewardDetailsOrReason) == 'table' and rewardDetailsOrReason.type == 'crate' then
                 local selection = rewardDetailsOrReason.selection or {}
-                print(('[Ghost Market]   › Skrzynia %s wylosowała %s (%s). Nagroda oczekuje na odebranie.')
+                print(('[Ghost Market]   › Skrzynia %s wylosowała %s (%s).')
                     :format(rewardDetailsOrReason.crateLabel or selectedItem.label,
                         selection.label or 'nieznana nagroda', selection.rarity or 'brak rzadkości'))
-
-                TriggerClientEvent('ghostmarket:purchaseResult', src, {
-                    success = true,
-                    balance = newBalance,
-                    item = {
-                        id = selectedItem.id,
-                        label = selectedItem.label
-                    },
-                    rewardContext = rewardDetailsOrReason
-                })
-
-            else
-                local rewarded, rewardDetailsOrReason = distributeReward(src, rewardData)
-                if not rewarded then
-                    addCoins(identifier, selectedItem.price, function()
-                        getCoins(identifier, function(refundBalance)
-                            TriggerClientEvent('ghostmarket:purchaseResult', src, { success = false, reason = rewardDetailsOrReason or 'reward_failed', balance = refundBalance })
-                        end)
-                    end)
-                    return
-                end
-
-                purchaseCooldowns[identifier] = now
-
-                print(('[Ghost Market] Gracz %s (%s) kupił %s za %d %s.')
-                    :format(xPlayer.getName(), identifier, selectedItem.label, selectedItem.price, Config.Currency.symbol))
-
-                TriggerClientEvent('ghostmarket:purchaseResult', src, {
-                    success = true,
-                    balance = newBalance,
-                    item = {
-                        id = selectedItem.id,
-                        label = selectedItem.label
-                    },
-                    rewardContext = rewardDetailsOrReason
-                })
             end
+
+            TriggerClientEvent('ghostmarket:purchaseResult', src, {
+                success = true,
+                balance = newBalance,
+                item = {
+                    id = selectedItem.id,
+                    label = selectedItem.label
+                },
+                rewardContext = rewardDetailsOrReason
+            })
         end)
     end)
 end)

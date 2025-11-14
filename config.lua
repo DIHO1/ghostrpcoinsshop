@@ -75,11 +75,17 @@ Config.Catalog = {
                     label = 'Prototypy',
                     tagline = 'Laboratoryjne projekty Ghost',
                 },
+                prop = {
+                    model = 'prop_box_wood02a',
+                    color = '#62f6ff',
+                    label = 'Skrzynia Prototypów'
+                },
                 rewardData = {
                     type = 'crate',
                     crateLabel = 'Skrzynia Prototypów',
                     animation = 'prototype',
                     highlight = '#62f6ff',
+                    model = 'prop_box_wood02a',
                     pool = {
                         {
                             id = 'specter_proto_crate',
@@ -215,11 +221,17 @@ Config.Catalog = {
                     label = 'Limitki',
                     tagline = 'Limitowane kolekcje',
                 },
+                prop = {
+                    model = 'prop_ld_suitcase_01',
+                    color = '#f86bff',
+                    label = 'Skrzynia Limitek'
+                },
                 rewardData = {
                     type = 'crate',
                     crateLabel = 'Skrzynia Limitek',
                     animation = 'limited',
                     highlight = '#f86bff',
+                    model = 'prop_ld_suitcase_01',
                     pool = {
                         {
                             id = 'ghost_suit',
@@ -427,11 +439,17 @@ Config.Catalog = {
                     label = 'Pojazdy',
                     tagline = 'Losowe nagrody garażowe',
                 },
+                prop = {
+                    model = 'prop_box_wood03a',
+                    color = '#7dffb3',
+                    label = 'Skrzynia Aut'
+                },
                 rewardData = {
                     type = 'crate',
                     crateLabel = 'Skrzynia Aut',
                     animation = 'garage',
                     highlight = '#7dffb3',
+                    model = 'prop_box_wood03a',
                     pool = {
                         {
                             id = 'paragon_car',
@@ -542,11 +560,17 @@ Config.Catalog = {
                     label = 'Arsenał',
                     tagline = 'Broń i ulepszenia',
                 },
+                prop = {
+                    model = 'prop_box_ammo02a',
+                    color = '#ff9f68',
+                    label = 'Skrzynka Arsenału'
+                },
                 rewardData = {
                     type = 'crate',
                     crateLabel = 'Skrzynka Arsenału',
                     animation = 'arsenal',
                     highlight = '#ff9f68',
+                    model = 'prop_box_ammo02a',
                     pool = {
                         {
                             id = 'pistol_mk2',
