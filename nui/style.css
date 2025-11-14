@@ -770,8 +770,8 @@ body.market-active .background-filter {
 .crate-overlay {
     position: fixed;
     inset: 0;
-    background: radial-gradient(120% 120% at 50% 40%, rgba(4, 12, 32, 0.55), rgba(1, 3, 10, 0.85));
-    backdrop-filter: blur(16px);
+    background: radial-gradient(140% 140% at 50% 35%, rgba(3, 9, 24, 0.45), rgba(2, 4, 12, 0.92));
+    backdrop-filter: blur(22px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -779,12 +779,12 @@ body.market-active .background-filter {
 }
 
 .crate-screen {
-    width: min(980px, 96vw);
-    background: linear-gradient(135deg, rgba(6, 16, 36, 0.78), rgba(2, 8, 22, 0.92));
-    border-radius: var(--radius-large);
-    padding: 36px;
-    border: 1px solid rgba(120, 185, 255, 0.35);
-    box-shadow: 0 60px 140px rgba(3, 10, 24, 0.72);
+    width: min(980px, 94vw);
+    background: linear-gradient(145deg, rgba(10, 20, 42, 0.82), rgba(4, 9, 24, 0.95));
+    border-radius: 36px;
+    padding: 38px;
+    border: 1px solid rgba(124, 199, 255, 0.38);
+    box-shadow: 0 80px 160px rgba(4, 12, 32, 0.78);
     display: flex;
     flex-direction: column;
     gap: 32px;
@@ -796,83 +796,115 @@ body.market-active .background-filter {
     justify-content: space-between;
 }
 
+.crate-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
 .crate-title {
-    font-size: 1.8rem;
+    font-size: 2.05rem;
     font-weight: 800;
 }
 
+.crate-subtitle {
+    font-size: 0.95rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(214, 236, 255, 0.6);
+}
+
 .crate-close {
-    background: transparent;
-    border: none;
+    background: rgba(12, 24, 52, 0.6);
+    border: 1px solid rgba(138, 214, 255, 0.35);
     color: var(--text-primary);
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    border-radius: 16px;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
     cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.crate-close:hover {
+    background: rgba(18, 42, 92, 0.85);
+    border-color: rgba(138, 214, 255, 0.55);
 }
 
 .crate-body {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 28px;
 }
 
 .crate-reel {
+    display: flex;
+    justify-content: center;
+}
+
+.crate-reel-frame {
     position: relative;
+    width: 100%;
     overflow: hidden;
-    border-radius: var(--radius-medium);
-    border: 1px solid rgba(111, 214, 255, 0.32);
-    background: linear-gradient(160deg, rgba(10, 26, 54, 0.72), rgba(4, 12, 28, 0.88));
-    padding: 26px 0;
+    border-radius: 28px;
+    border: 1px solid rgba(124, 199, 255, 0.32);
+    background: radial-gradient(120% 120% at 50% 0%, rgba(24, 52, 110, 0.68), rgba(6, 14, 32, 0.92));
+    padding: 34px 36px;
+    box-shadow: inset 0 0 0 1px rgba(124, 199, 255, 0.1), 0 40px 100px rgba(4, 12, 32, 0.5);
 }
 
 .crate-indicator {
     position: absolute;
     top: 50%;
-    left: 0;
-    right: 0;
+    left: 18%;
+    right: 18%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(99, 240, 255, 0.9), transparent);
+    background: linear-gradient(90deg, transparent, rgba(145, 228, 255, 0.95), transparent);
     transform: translateY(-50%);
+    box-shadow: 0 0 24px rgba(145, 228, 255, 0.48);
 }
 
 .crate-track {
     display: flex;
-    gap: 22px;
+    gap: 28px;
     will-change: transform;
 }
 
 .crate-card {
     position: relative;
-    min-width: 180px;
-    padding: 18px 20px;
-    border-radius: 20px;
-    background: rgba(10, 28, 60, 0.85);
-    border: 1px solid rgba(111, 214, 255, 0.26);
+    min-width: 210px;
+    padding: 20px 22px;
+    border-radius: 28px;
+    background: linear-gradient(150deg, rgba(12, 28, 62, 0.86), rgba(8, 18, 44, 0.9));
+    border: 1px solid rgba(124, 199, 255, 0.26);
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 18px 45px rgba(3, 12, 28, 0.6);
-    transition: transform 0.25s ease;
+    align-items: flex-start;
+    gap: 18px;
+    box-shadow: 0 30px 90px rgba(4, 12, 32, 0.58);
+    transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
 }
 
 .crate-card::before {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: 1px;
     border-radius: inherit;
-    background: linear-gradient(150deg, rgba(111, 214, 255, 0.2), transparent 70%);
+    background: linear-gradient(140deg, rgba(124, 199, 255, 0.24), transparent 70%);
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.35s ease;
 }
 
 .crate-card .prop {
-    width: 68px;
-    height: 68px;
-    border-radius: 18px;
+    width: 88px;
+    height: 88px;
+    border-radius: 24px;
     display: grid;
     place-items: center;
-    font-size: 1.45rem;
-    background: rgba(111, 214, 255, 0.12);
-    border: 1px solid rgba(111, 214, 255, 0.35);
+    font-size: 1.6rem;
+    background: rgba(124, 199, 255, 0.12);
+    border: 1px solid rgba(124, 199, 255, 0.28);
     position: relative;
     overflow: hidden;
     background-size: cover;
@@ -882,31 +914,29 @@ body.market-active .background-filter {
 .crate-card .prop span,
 .crate-prop-icon {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 .crate-card .info {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 10px;
 }
 
 .crate-card .label {
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 700;
-    color: rgba(236, 244, 255, 0.92);
 }
 
 .crate-card .rarity {
     font-size: 0.82rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: rgba(214, 224, 255, 0.72);
+    letter-spacing: 0.14em;
+    color: rgba(214, 236, 255, 0.7);
 }
 
 .crate-card[data-winning="true"] {
-    transform: scale(1.06);
-    box-shadow: 0 38px 110px rgba(111, 214, 255, 0.35);
+    transform: translateY(-12px);
 }
 
 .crate-card[data-winning="true"]::before {
@@ -915,12 +945,12 @@ body.market-active .background-filter {
 
 .crate-card[data-rarity="mityczny"],
 .crate-card[data-rarity="legendarny"] {
-    border-color: rgba(248, 107, 255, 0.45);
-    box-shadow: 0 30px 95px rgba(248, 107, 255, 0.28);
+    border-color: rgba(248, 107, 255, 0.48);
+    box-shadow: 0 40px 120px rgba(248, 107, 255, 0.28);
 }
 
 .crate-card[data-rarity="epicki"] {
-    border-color: rgba(111, 214, 255, 0.38);
+    border-color: rgba(124, 199, 255, 0.42);
 }
 
 .crate-card[data-rarity="rzadki"] {
@@ -928,37 +958,57 @@ body.market-active .background-filter {
 }
 
 .crate-card[data-rarity="niepospolity"] {
-    border-color: rgba(111, 214, 255, 0.22);
+    border-color: rgba(124, 199, 255, 0.22);
 }
 
-
 .crate-world-hint {
-    margin: -6px 0 8px;
-    font-size: 0.9rem;
-    color: rgba(214, 236, 255, 0.78);
+    margin: -4px auto 4px;
+    font-size: 0.88rem;
+    color: rgba(214, 236, 255, 0.76);
     text-align: center;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.08em;
 }
 
 .crate-summary {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 26px 30px;
+    border-radius: 32px;
+    background: linear-gradient(150deg, rgba(18, 40, 86, 0.85), rgba(10, 24, 58, 0.92));
+    border: 1px solid rgba(124, 199, 255, 0.3);
+    box-shadow: 0 40px 120px rgba(4, 12, 32, 0.55);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.crate-summary.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.crate-summary-info {
+    display: flex;
+    align-items: center;
     gap: 20px;
-    padding: 22px 24px;
-    border-radius: var(--radius-medium);
-    background: rgba(9, 26, 56, 0.75);
-    border: 1px solid rgba(111, 214, 255, 0.26);
+}
+
+.crate-summary-action {
+    display: flex;
+    align-items: center;
 }
 
 .crate-prop {
-    width: 82px;
-    height: 82px;
-    border-radius: 26px;
+    width: 96px;
+    height: 96px;
+    border-radius: 30px;
     display: grid;
     place-items: center;
-    background: rgba(90, 173, 255, 0.18);
-    border: 1px solid rgba(111, 214, 255, 0.28);
-    font-size: 2rem;
+    background: rgba(124, 199, 255, 0.14);
+    border: 1px solid rgba(124, 199, 255, 0.3);
+    font-size: 2.1rem;
     position: relative;
     overflow: hidden;
     background-size: cover;
@@ -969,7 +1019,7 @@ body.market-active .background-filter {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(155deg, rgba(6, 14, 30, 0.2), rgba(6, 14, 30, 0.55));
+    background: linear-gradient(155deg, rgba(6, 14, 30, 0.22), rgba(6, 14, 30, 0.6));
     pointer-events: none;
 }
 
@@ -977,11 +1027,10 @@ body.market-active .background-filter {
     display: none !important;
 }
 
-
 .prop--world {
-    background: rgba(10, 28, 60, 0.55);
-    border: 1px solid rgba(111, 214, 255, 0.45);
-    backdrop-filter: blur(18px);
+    background: rgba(8, 22, 54, 0.58);
+    border: 1px solid rgba(145, 228, 255, 0.42);
+    backdrop-filter: blur(22px);
     position: relative;
     pointer-events: none;
     color: rgba(236, 244, 255, 0.9);
@@ -990,9 +1039,9 @@ body.market-active .background-filter {
 .prop--world::before {
     content: 'MODEL';
     position: absolute;
-    top: 6px;
-    left: 6px;
-    right: 6px;
+    top: 8px;
+    left: 8px;
+    right: 8px;
     font-size: 0.58rem;
     letter-spacing: 0.32em;
     text-align: center;
@@ -1002,37 +1051,45 @@ body.market-active .background-filter {
 .prop--world::after {
     content: attr(data-model);
     position: absolute;
-    bottom: 6px;
-    left: 6px;
-    right: 6px;
-    font-size: 0.7rem;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    font-size: 0.74rem;
     letter-spacing: 0.08em;
     text-align: center;
     color: rgba(236, 244, 255, 0.86);
 }
+
 .crate-item-details {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+}
+
+.crate-item-eyebrow {
+    font-size: 0.78rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(214, 236, 255, 0.55);
 }
 
 .crate-item-label {
-    font-size: 1.25rem;
-    font-weight: 700;
+    font-size: 1.45rem;
+    font-weight: 800;
 }
 
 .crate-item-detail {
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.98rem;
+    color: rgba(245, 249, 255, 0.8);
 }
 
 .crate-item-rarity {
     font-size: 0.95rem;
-    color: var(--text-secondary);
+    color: rgba(214, 236, 255, 0.78);
 }
 
 .crate-summary .btn {
-    margin-left: auto;
+    min-width: 160px;
 }
 
 @media (max-width: 1200px) {

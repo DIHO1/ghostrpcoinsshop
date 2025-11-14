@@ -42,6 +42,7 @@ const statusClock = document.getElementById('statusClock');
 const navLinks = Array.from(document.querySelectorAll('.nav-link'));
 const crateOverlay = document.getElementById('crateOverlay');
 const crateTitle = document.getElementById('crateTitle');
+const crateSubtitle = document.getElementById('crateSubtitle');
 const crateTrack = document.getElementById('crateTrack');
 const crateReel = document.getElementById('crateReel');
 const crateSummary = document.getElementById('crateSummary');
@@ -50,6 +51,7 @@ const cratePropIcon = document.getElementById('cratePropIcon');
 const crateRewardLabel = document.getElementById('crateRewardLabel');
 const crateRewardDetail = document.getElementById('crateRewardDetail');
 const crateRewardRarity = document.getElementById('crateRewardRarity');
+const crateEyebrow = document.getElementById('crateEyebrow');
 const crateContinue = document.getElementById('crateContinue');
 const crateClose = document.getElementById('crateClose');
 
@@ -978,8 +980,17 @@ function resetCrateOverlay() {
         crateSummary.style.boxShadow = '';
         crateSummary.style.borderColor = '';
     }
+    if (crateSubtitle) {
+        crateSubtitle.textContent = 'Ekskluzywna skrzynka Ghost Market';
+    }
+    if (crateEyebrow) {
+        crateEyebrow.textContent = 'Nagroda';
+    }
     if (crateRewardRarity) {
         crateRewardRarity.style.color = '';
+    }
+    if (crateRewardLabel) {
+        crateRewardLabel.textContent = 'Nagroda';
     }
     if (crateRewardDetail) {
         crateRewardDetail.textContent = '';
@@ -1125,12 +1136,27 @@ function playCrateAnimation(item, context) {
 
     crateOverlay.classList.remove('hidden');
     crateTitle.textContent = context.crateLabel || item.label || 'Skrzynia';
+    if (crateSubtitle) {
+        const subtitle = context.crateSubtitle
+            || (item.visual && item.visual.tagline)
+            || item.description
+            || 'Ekskluzywna skrzynka Ghost Market';
+        crateSubtitle.textContent = subtitle;
+    }
     if (crateSummary) {
         crateSummary.classList.remove('visible');
     }
 
     const highlight = context.highlight || '#62f6ff';
     const selection = context.selection || {};
+    if (crateEyebrow) {
+        const selectionType = selection.rewardType
+            || (selection.rewardDetails && selection.rewardDetails.rewardType)
+            || (selection.reward && selection.reward.type)
+            || context.rewardType
+            || (item.rewardData && item.rewardData.type);
+        crateEyebrow.textContent = formatTypeLabel(selectionType) || 'Nagroda';
+    }
     const summaryAccent = applyPropVisual(
         crateRewardProp,
         cratePropIcon,
@@ -1156,6 +1182,34 @@ function playCrateAnimation(item, context) {
         crateSummary.style.borderColor = borderColor;
         crateSummary.style.boxShadow = `0 26px 70px ${glowColor}`;
     }
+
+    const pushRewardPreview = () => {
+        previewState.suspended = false;
+        previewState.activeId = null;
+
+        const rewardDetails = selection.rewardDetails || {};
+        const inferredType = selection.rewardType
+            || rewardDetails.rewardType
+            || (selection.reward && selection.reward.type);
+
+        if (!inferredType) {
+            return;
+        }
+
+        const previewPayload = {
+            id: `${item.id || 'crate'}:${selection.id || 'reward'}`,
+            label: selection.label || item.label,
+            icon: selection.icon || item.icon,
+            type: inferredType,
+            rewardData: {
+                ...rewardDetails,
+                type: inferredType
+            },
+            prop: selection.prop
+        };
+
+        sendPreviewRequest(previewPayload, true, 60);
+    };
 
     crateTrack.innerHTML = '';
     const cards = buildCrateCards(context.poolPreview, selection, activeAccent);
@@ -1219,6 +1273,7 @@ function playCrateAnimation(item, context) {
                 crateSummary.classList.add('visible');
             }
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
+            pushRewardPreview();
             return;
         }
 
@@ -1250,6 +1305,7 @@ function playCrateAnimation(item, context) {
             }
             addActivityEntry(`🎉 ${selection.label || item.label}`, true);
             state.crateAnimation = null;
+            pushRewardPreview();
         };
     });
 }
