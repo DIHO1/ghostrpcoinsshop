@@ -215,11 +215,6 @@ createApp({
             }
         })
 
-        const root = document.getElementById('app')
-        if (root) {
-            root.style.display = 'flex'
-        }
-
         fetch(`https://${GetParentResourceName()}/ghostmarket:ready`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
