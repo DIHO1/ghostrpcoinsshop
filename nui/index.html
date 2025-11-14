@@ -9,30 +9,27 @@
     <div class="background-filter"></div>
     <div id="app" class="market hidden">
         <header class="market-topbar">
-            <div class="topbar-left">
+            <div class="topbar-inner">
                 <div class="brand">
-                    <span class="brand-logo">Ghost<span>Market</span></span>
-                    <span class="brand-tag">Premium Storefront</span>
+                    <span class="brand-logo">HAZE</span>
+                    <span class="brand-tag">Ghost Market</span>
                 </div>
                 <nav class="primary-nav">
                     <button class="nav-link active" data-target="hero">Strona główna</button>
-                    <button class="nav-link" data-target="event_crates">Skrzynki</button>
-                    <button class="nav-link" data-target="vehicles">Pojazdy</button>
+                    <button class="nav-link" data-target="event_crates">Event Case</button>
+                    <button class="nav-link" data-target="vehicles">Samochody</button>
                     <button class="nav-link" data-target="crates">Ruletka</button>
-                    <button class="nav-link" data-target="boosts">Misje</button>
+                    <button class="nav-link" data-target="boosts">Crash</button>
                     <button class="nav-link" data-target="services">Usługi</button>
-                    <button class="nav-link" data-target="activity">Ranking</button>
                 </nav>
-            </div>
-            <div class="topbar-right">
-                <div class="status-pills">
-                    <span class="status-pill">DMG</span>
-                    <span class="status-pill pill-event">Event</span>
+                <div class="topbar-actions">
+                    <button class="nav-link utility-btn" data-target="activity">Historia</button>
+                    <button class="nav-link utility-btn" data-target="event_crates">🎟 Event</button>
+                    <div class="wallet" id="walletDisplay">
+                        <span class="wallet-label">Ghost Coins</span>
+                        <span class="wallet-value" id="walletValue">💎 0</span>
+                    </div>
                     <span class="status-clock" id="statusClock">20:28</span>
-                </div>
-                <div class="wallet" id="walletDisplay">
-                    <span class="wallet-label">Ghost Coins</span>
-                    <span class="wallet-value" id="walletValue">💎 0</span>
                 </div>
             </div>
         </header>
@@ -61,8 +58,8 @@
 
             <section class="catalog-section activity" data-section="activity">
                 <header>
-                    <h2>Aktywność</h2>
-                    <p class="section-subtitle">Rejestr ostatnich zakupów i nagród Ghost Market.</p>
+                    <h2>Historia transakcji</h2>
+                    <p class="section-subtitle">Ostatnie dropy i zakupy w Ghost Market.</p>
                 </header>
                 <div class="activity-log" id="activityLog">
                     <p class="placeholder">Brak ostatnich zakupów. Dokonaj transakcji, aby pojawiły się wpisy.</p>

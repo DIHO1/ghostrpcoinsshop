@@ -28,23 +28,23 @@ Config.AntiSpam = {
     cooldown = 5000 -- milliseconds
 }
 
--- Hero + section layout metadata for the tablet storefront
+-- Hero + section layout metadata dla pełnoekranowego interfejsu sklepu
 Config.Layout = {
     hero = {
-        badge = 'Nowe skrzynki eventowe',
-        title = 'Nowe skrzynki eventowe - ograniczone czasowo!',
-        subtitle = 'Sprawdź, które pakiety znikną z oferty Ghost Market jeszcze w tym tygodniu.',
+        badge = 'Limitowany event',
+        title = 'LIMITOWANY OG GANG CASE!',
+        subtitle = 'Otwórz skrzynkę i zgarnij unikalne pojazdy, boosty oraz ekskluzywne nagrody zanim event dobiegnie końca.',
         countdown = {
-            label = 'Koniec za:',
+            label = 'Event kończy się za:',
             fallback = 'Wkrótce',
             eventKey = 'hero_event'
         },
-        primaryCTA = { label = 'Sprawdź skrzynki', target = 'event_crates' },
-        secondaryCTA = { label = 'Kup pojazd', target = 'vehicles' },
+        primaryCTA = { label = 'Sprawdź event case', target = 'event_crates' },
+        secondaryCTA = { label = 'Kup samochód', target = 'vehicles' },
         featuredItems = {
+            'limited_crate',
             'prototype_crate',
-            'specter_proto',
-            'limited_crate'
+            'specter_proto'
         }
     },
     sections = {}
@@ -56,7 +56,7 @@ Config.Catalog = {
         key = 'event',
         section = {
             id = 'event_crates',
-            title = 'Skrzynki Eventowe',
+            title = 'Event Case',
             subtitle = 'Limitowane skrzynki przygotowane specjalnie na aktualne wydarzenie.',
             variant = 'highlight',
             filter = { category = 'event' }
@@ -210,25 +210,25 @@ Config.Catalog = {
             },
             {
                 id = 'limited_crate',
-                label = 'Skrzynia Limitek',
+                label = 'OG Gang Case',
                 price = 210,
                 icon = '🎁',
-                description = 'Ekskluzywne nagrody limitowane czasowo i kolekcjonerskie.',
+                description = 'Limitowana skrzynka OG Gang z wyjątkowymi skinami, boostami i gotówką.',
                 visual = {
                     type = 'crate',
                     icon = '🎁',
                     accent = '#f86bff',
-                    label = 'Limitki',
-                    tagline = 'Limitowane kolekcje',
+                    label = 'OG Gang',
+                    tagline = 'Limitowana kolekcja',
                 },
                 prop = {
                     model = 'prop_ld_suitcase_01',
                     color = '#f86bff',
-                    label = 'Skrzynia Limitek'
+                    label = 'OG Gang Case'
                 },
                 rewardData = {
                     type = 'crate',
-                    crateLabel = 'Skrzynia Limitek',
+                    crateLabel = 'OG Gang Case',
                     animation = 'limited',
                     highlight = '#f86bff',
                     model = 'prop_ld_suitcase_01',
@@ -359,7 +359,7 @@ Config.Catalog = {
         key = 'vehicles',
         section = {
             id = 'vehicles',
-            title = 'Pojazdy do kupna',
+            title = 'Samochody',
             subtitle = 'Zakup pojazd i przekaż go do swojego garażu z pomocą integracji serwera.',
             variant = 'feature',
             filter = { category = 'vehicles' }
@@ -420,9 +420,9 @@ Config.Catalog = {
         key = 'crates',
         section = {
             id = 'crates',
-            title = 'Skrzynki Specjalne',
+            title = 'Ruletka',
             subtitle = 'Stała rotacja skrzynek Ghost Market z różnymi nagrodami.',
-            variant = 'grid',
+            variant = 'highlight',
             filter = { category = 'crates' }
         },
         items = {
@@ -675,7 +675,7 @@ Config.Catalog = {
         key = 'boosts',
         section = {
             id = 'boosts',
-            title = 'Pakiety i zasoby',
+            title = 'Crash',
             subtitle = 'Natychmiastowe wzmocnienia, zapasy oraz premie gotówkowe.',
             variant = 'grid',
             filter = { category = 'boosts' }
@@ -750,7 +750,7 @@ Config.Catalog = {
         key = 'services',
         section = {
             id = 'services',
-            title = 'Usługi premium',
+            title = 'Usługi',
             subtitle = 'Odblokuj dostęp do wyjątkowych rang i dodatkowych przywilejów.',
             variant = 'list',
             filter = { category = 'services' }

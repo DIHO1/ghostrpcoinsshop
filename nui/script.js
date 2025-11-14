@@ -1375,21 +1375,33 @@ function updateNavForPosition() {
     }
 
     const scrollTop = contentScroll.scrollTop || 0;
-    const activity = document.querySelector('[data-section="activity"]');
+    const offsetPoint = scrollTop + 200;
+    let activeTarget = 'hero';
 
+    if (sectionsRoot) {
+        const sectionElements = Array.from(sectionsRoot.querySelectorAll('[data-section]'));
+        sectionElements.forEach((section) => {
+            const id = section.dataset.section;
+            if (!id) {
+                return;
+            }
+
+            const sectionTop = section.offsetTop || 0;
+            if (offsetPoint >= Math.max(sectionTop - 40, 0)) {
+                activeTarget = id;
+            }
+        });
+    }
+
+    const activity = document.querySelector('[data-section="activity"]');
     if (activity) {
-        const threshold = Math.max(activity.offsetTop - 120, 0);
-        if (scrollTop >= threshold) {
-            setActiveNav('activity');
-            return;
+        const activityThreshold = Math.max(activity.offsetTop - 160, 0);
+        if (scrollTop >= activityThreshold) {
+            activeTarget = 'activity';
         }
     }
 
-    if (scrollTop > 40) {
-        setActiveNav('sections');
-    } else {
-        setActiveNav('hero');
-    }
+    setActiveNav(activeTarget);
 }
 
 function scrollToSection(target) {
