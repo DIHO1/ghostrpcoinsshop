@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ghost Market</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+    <div id="app">
+        <div v-if="visible" class="app-root">
+            <div class="market-container">
+                <header class="top-bar">
+                    <div class="brand">
+                        <span class="icon">👻</span>
+                        <div class="brand-copy">
+                            <h1>{{ phrases.tabletTitle }}</h1>
+                            <p>{{ hero.subtitle }}</p>
+                        </div>
+                    </div>
+                    <div class="balance">
+                        <span class="label">{{ phrases.balanceLabel }}</span>
+                        <span class="value">{{ formatBalance(balance) }}</span>
+                    </div>
+                </header>
+
+                <div class="market-body">
+                    <main class="main-column">
+                        <section class="hero" :style="heroStyle">
+                            <div class="badge" v-if="hero.badge">
+                                {{ hero.badge.text }}
+                            </div>
+                            <div class="hero-text">
+                                <h2>{{ hero.title }}</h2>
+                                <p>{{ hero.subtitle }}</p>
+                                <div class="hero-timer" v-if="event">
+                                    <span>{{ phrases.heroTimer }}</span>
+                                    <strong>{{ eventCountdown }}</strong>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="featured" v-if="layout.featured && layout.featured.length">
+                            <header class="section-header">
+                                <h3>Polecane</h3>
+                            </header>
+                            <div class="card-grid">
+                                <article v-for="item in layout.featured" :key="item.id" class="card" :style="backgroundImage(item.image)">
+                                    <div class="ribbon" v-if="item.ribbon">{{ item.ribbon }}</div>
+                                    <div class="card-content">
+                                        <h4>{{ item.title }}</h4>
+                                        <p>{{ item.description }}</p>
+                                        <div class="card-footer">
+                                            <span class="price">{{ currency.icon }} {{ item.price }}</span>
+                                            <button @click="selectItem(item.id)">{{ phrases.buyButton }}</button>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+
+                        <section class="catalog" v-if="layout.categories">
+                            <header class="section-header">
+                                <h3>Kategorie</h3>
+                                <div class="tabs">
+                                    <button
+                                        v-for="category in layout.categories"
+                                        :key="category.id"
+                                        :class="['tab', { active: selectedCategory === category.id }]"
+                                        @click="selectCategory(category.id)"
+                                    >
+                                        <span class="material">{{ category.icon }}</span>
+                                        <span>{{ category.label }}</span>
+                                    </button>
+                                </div>
+                            </header>
+
+                            <div class="catalog-grid">
+                                <article
+                                    v-for="item in categoryItems"
+                                    :key="item.id"
+                                    class="catalog-card"
+                                >
+                                    <div class="catalog-body">
+                                        <h4>{{ item.label }}</h4>
+                                        <p>{{ item.description }}</p>
+                                    </div>
+                                    <div class="catalog-footer">
+                                        <span class="price">{{ currency.icon }} {{ item.price }}</span>
+                                        <button @click="selectItem(item.id)">{{ phrases.buyButton }}</button>
+                                    </div>
+                                </article>
+                            </div>
+                        </section>
+                    </main>
+
+                    <aside class="activity-panel" v-if="activityEnabled">
+                        <header class="section-header">
+                            <h3>{{ phrases.history }}</h3>
+                        </header>
+                        <ul>
+                            <li v-if="!activity.length">Brak danych</li>
+                            <li v-for="entry in activity" :key="entry.id">
+                                <span class="who">{{ anonymize(entry.identifier) }}</span>
+                                <span class="what">{{ resolveItemLabel(entry.item_id) }}</span>
+                                <span class="when">{{ formatDate(entry.created_at) }}</span>
+                            </li>
+                        </ul>
+                    </aside>
+                </div>
+            </div>
+
+            <transition name="modal">
+                <div class="modal" v-if="selected">
+                    <div class="modal-content">
+                        <header>
+                            <h4>{{ phrases.confirmTitle }}</h4>
+                            <button class="close" @click="selected = null">×</button>
+                        </header>
+                        <div class="modal-body">
+                            <p>{{ phrases.confirmDescription }}</p>
+                            <div class="modal-item">
+                                <h5>{{ selected.label }}</h5>
+                                <p>{{ selected.description }}</p>
+                                <strong>{{ currency.icon }} {{ selected.price }}</strong>
+                            </div>
+                        </div>
+                        <footer>
+                            <button class="secondary" @click="selected = null">{{ phrases.cancel }}</button>
+                            <button class="primary" @click="purchase(selected.id)">{{ phrases.confirm }}</button>
+                        </footer>
+                    </div>
+                </div>
+            </transition>
+
+            <transition name="modal">
+                <div class="modal" v-if="crate">
+                    <div class="modal-content">
+                        <header>
+                            <h4>Wynik skrzynki</h4>
+                            <button class="close" @click="crate = null">×</button>
+                        </header>
+                        <div class="modal-body">
+                            <p>Zdobyto: <strong>{{ crate.reward.label }}</strong></p>
+                        </div>
+                        <footer>
+                            <button class="primary" @click="crate = null">Zamknij</button>
+                        </footer>
+                    </div>
+                </div>
+            </transition>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.4.21/dist/vue.global.prod.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
