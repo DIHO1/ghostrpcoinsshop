@@ -35,6 +35,7 @@ html.ghost-market-visible {
         radial-gradient(circle at 85% 10%, rgba(0, 210, 211, 0.22), transparent 45%),
         #040018;
     overflow: hidden;
+    overscroll-behavior: none;
 }
 
 #app {
@@ -142,6 +143,8 @@ html.ghost-market-visible {
     padding-right: 14px;
     min-height: 0;
     scrollbar-gutter: stable;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .main-column::-webkit-scrollbar,
@@ -164,6 +167,11 @@ html.ghost-market-visible {
     padding: 36px 40px;
     box-shadow: var(--panel-shadow);
     overflow: hidden;
+}
+
+.activity-panel {
+    display: flex;
+    flex-direction: column;
 }
 
 .main-column > section::before,
@@ -246,6 +254,7 @@ html.ghost-market-visible {
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(5, 6, 18, 0.4), rgba(5, 6, 24, 0.85));
+    pointer-events: none;
 }
 
 .hero-inner {
@@ -530,6 +539,9 @@ html.ghost-market-visible {
     overflow-y: auto;
     padding-right: 6px;
     min-height: 0;
+    margin-right: -8px;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 .activity-panel li {

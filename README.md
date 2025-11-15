@@ -39,11 +39,13 @@ W pliku [`config.lua`](config.lua) znajdziesz:
 - układ tabletu (`Config.Layout`) – hero sekcja, sekcje katalogu, wyróżnione elementy,
 - pełną listę produktów (`Config.ShopItems`) w tym skrzynki z wagami dropów, pojazdy, usługi i boosty.
 
+Sekcja `Config.Images` pozwala wskazać katalog z własnymi miniaturami (`base` + `extension`) oraz czy korzystać z natywnych ikon GTA (`weaponBase`, `propBase`). Jeżeli produkt ma pole `weapon_...` albo `prop_...`, interfejs automatycznie wyświetli odpowiedni render modelu, a w pozostałych przypadkach użyje grafiki z katalogu lub wbudowanego fallbacku `images/fallback.svg`.
+
 Dostosuj strukturę według potrzeb – każdy produkt posiada `rewardData` przekazywane do serwera (`item`, `money`, `group`, `vehicle` oraz `crate`).
 
 ## Interfejs NUI
 - Pełnoekranowe tło wykorzystuje grafikę Franklina z lekkim rozmyciem i neonową warstwą.
-- Tablet wyświetla saldo, hero sekcję z licznikiem, katalog z filtrowaniem, log aktywności i animacje otwierania skrzynek.
+- Tablet wyświetla saldo, hero sekcję z licznikiem, katalog z filtrowaniem, log aktywności i animacje otwierania skrzynek. Dla produktów automatycznie renderowane są ikonki broni/propów (np. `weapon_pistol`, `prop_cs_package_01`) bez konieczności podmieniania HTML.
 - Zakupy wymagają potwierdzenia w modalnym oknie, a interfejs można zamknąć przyciskiem, komendą lub klawiszem **ESC**.
 
 ## Integracje nagród

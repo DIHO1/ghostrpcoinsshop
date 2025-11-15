@@ -1,10 +1,17 @@
 local isOpen = false
 local lastOpen = 0
 
+local function send(action, data)
+    SendNUIMessage({
+        action = action,
+        data = data
+    })
+end
+
 local function setDisplay(state)
     SetNuiFocus(state, state)
     if SetNuiFocusKeepInput then
-        SetNuiFocusKeepInput(false)
+        SetNuiFocusKeepInput(state)
     end
 
     local playerPed = PlayerPedId()
@@ -13,13 +20,7 @@ local function setDisplay(state)
     end
 
     isOpen = state
-end
-
-local function send(action, data)
-    SendNUIMessage({
-        action = action,
-        data = data
-    })
+    send('visible', { state = state })
 end
 
 local keyCommand = Config.Keybind.command or 'ghostmarket:tablet'

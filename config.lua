@@ -27,7 +27,9 @@ Config.Currency = {
 Config.Images = {
     base = 'nui://esx_inventory/html/img',
     extension = '.png',
-    fallback = ''
+    fallback = 'images/fallback.svg',
+    weaponBase = 'nui://game/ui/weapon',
+    propBase = 'nui://game/ui/prop'
 }
 
 Config.Database = {

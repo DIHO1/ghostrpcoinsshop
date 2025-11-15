@@ -61,15 +61,28 @@
                                 <h3>Polecane</h3>
                             </header>
                             <div class="card-grid">
-                                <article v-for="item in layout.featured" :key="item.id" class="card" :style="artworkStyles(item)">
+                                <article
+                                    v-for="item in layout.featured"
+                                    :key="item.id"
+                                    :class="['card', { 'has-art': artworkUrl(item) }]"
+                                    :style="cardAccent(item)"
+                                >
                                     <div class="ribbon" v-if="item.ribbon">{{ item.ribbon }}</div>
-                                    <div class="card-content">
-                                        <h4>{{ item.title }}</h4>
-                                        <p>{{ item.description }}</p>
+                                    <div class="card-body">
+                                        <div class="card-copy">
+                                            <h4>{{ item.title }}</h4>
+                                            <p>{{ item.description }}</p>
+                                        </div>
                                         <div class="card-footer">
-                                            <span class="price">{{ currency.icon }} {{ item.price }}</span>
+                                            <div class="price-block">
+                                                <span class="price-label">{{ currency.icon }}</span>
+                                                <span class="price">{{ formatPrice(item.price) }}</span>
+                                            </div>
                                             <button @click="selectItem(item.id)">{{ phrases.buyButton }}</button>
                                         </div>
+                                    </div>
+                                    <div class="card-art" v-if="artworkUrl(item)">
+                                        <img :src="artworkUrl(item)" :alt="item.title" />
                                     </div>
                                 </article>
                             </div>

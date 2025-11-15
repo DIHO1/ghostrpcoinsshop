@@ -8,7 +8,7 @@ createApp({
             hero: {},
             layout: { featured: [], categories: [] },
             currency: { icon: '👻', short: 'GC' },
-            images: { base: '', extension: '', fallback: '' },
+            images: { base: '', extension: '', fallback: '', weaponBase: 'nui://game/ui/weapon', propBase: 'nui://game/ui/prop' },
             phrases: {
                 tabletTitle: 'Ghost Market',
                 balanceLabel: 'Saldo',
@@ -148,7 +148,7 @@ createApp({
                 }
             })
         },
-        buildPropAsset(name) {
+        buildConfiguredAsset(name) {
             if (!name) {
                 return ''
             }
@@ -164,6 +164,20 @@ createApp({
                 .replace(/[^a-z0-9_/-]/g, '')
             return `${sanitizedBase}/${normalized}${extension}`
         },
+        buildNativeAsset(name, kind) {
+            if (!name) {
+                return ''
+            }
+            const settings = this.images || {}
+            const key = kind === 'weapon' ? 'weaponBase' : 'propBase'
+            const base = typeof settings[key] === 'string' ? settings[key].trim() : ''
+            if (!base) {
+                return ''
+            }
+            const sanitizedBase = base.endsWith('/') ? base.slice(0, -1) : base
+            const normalized = String(name).toLowerCase()
+            return `${sanitizedBase}/${normalized}.png`
+        },
         resolveArtwork(item) {
             if (!item) {
                 return ''
@@ -178,9 +192,18 @@ createApp({
             if (propSource) {
                 const normalized = String(propSource).toLowerCase()
                 if (normalized.startsWith('weapon_')) {
-                    return `nui://game/ui/weapon/${normalized}.png`
+                    const weaponIcon = this.buildNativeAsset(normalized, 'weapon')
+                    if (weaponIcon) {
+                        return weaponIcon
+                    }
                 }
-                const asset = this.buildPropAsset(normalized)
+                if (normalized.startsWith('prop_')) {
+                    const propIcon = this.buildNativeAsset(normalized, 'prop')
+                    if (propIcon) {
+                        return propIcon
+                    }
+                }
+                const asset = this.buildConfiguredAsset(normalized)
                 if (asset) {
                     return asset
                 }
@@ -375,6 +398,14 @@ createApp({
                     break
                 case 'crate':
                     this.crate = data
+                    break
+                case 'visible':
+                    this.visible = !!data.state
+                    if (!this.visible) {
+                        this.stopTimer()
+                        this.selected = null
+                        this.crate = null
+                    }
                     break
             }
         })
