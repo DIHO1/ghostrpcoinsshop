@@ -4,7 +4,7 @@ local lastOpen = 0
 local function setDisplay(state)
     SetNuiFocus(state, state)
     if SetNuiFocusKeepInput then
-        SetNuiFocusKeepInput(state)
+        SetNuiFocusKeepInput(false)
     end
 
     local playerPed = PlayerPedId()

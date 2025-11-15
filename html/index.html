@@ -58,7 +58,7 @@
                                 <h3>Polecane</h3>
                             </header>
                             <div class="card-grid">
-                                <article v-for="item in layout.featured" :key="item.id" class="card" :style="backgroundImage(item.image)">
+                                <article v-for="item in layout.featured" :key="item.id" class="card" :style="artworkStyles(item)">
                                     <div class="ribbon" v-if="item.ribbon">{{ item.ribbon }}</div>
                                     <div class="card-content">
                                         <h4>{{ item.title }}</h4>
@@ -93,6 +93,7 @@
                                     v-for="item in categoryItems"
                                     :key="item.id"
                                     class="catalog-card"
+                                    :style="artworkStyles(item)"
                                 >
                                     <div class="catalog-body">
                                         <h4>{{ item.label }}</h4>

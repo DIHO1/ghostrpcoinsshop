@@ -24,12 +24,17 @@
 
 body {
     font-family: 'Rubik', sans-serif;
-    background: radial-gradient(circle at 15% 20%, rgba(93, 64, 255, 0.25), transparent 55%),
-        radial-gradient(circle at 80% 10%, rgba(52, 201, 255, 0.2), transparent 45%),
-        #040312;
+    background: transparent;
     min-height: 100vh;
     color: var(--text-primary);
     margin: 0;
+}
+
+body.ghost-market-visible,
+html.ghost-market-visible {
+    background: radial-gradient(circle at 15% 20%, rgba(93, 64, 255, 0.25), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(52, 201, 255, 0.2), transparent 45%),
+        #040312;
     overflow: hidden;
 }
 
@@ -467,6 +472,9 @@ body {
     box-shadow: 0 26px 70px rgba(10, 12, 40, 0.45);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover, contain;
+    background-position: center, center;
 }
 
 .card:hover {
@@ -621,7 +629,7 @@ body {
 
 .catalog-card {
     position: relative;
-    background: linear-gradient(145deg, rgba(13, 11, 36, 0.92), rgba(9, 10, 28, 0.92));
+    background-color: rgba(13, 11, 36, 0.92);
     border-radius: 22px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     padding: 22px;
@@ -632,6 +640,10 @@ body {
     min-height: 170px;
     box-shadow: 0 22px 60px rgba(7, 9, 30, 0.45);
     overflow: hidden;
+    background-repeat: no-repeat;
+    background-size: cover, contain;
+    background-position: center, center;
+    background-blend-mode: lighten;
 }
 
 .catalog-card::before {

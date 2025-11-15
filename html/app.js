@@ -8,6 +8,7 @@ createApp({
             hero: {},
             layout: { featured: [], categories: [] },
             currency: { icon: '👻', short: 'GC' },
+            images: { base: '', extension: '', fallback: '' },
             phrases: {},
             items: {},
             activity: [],
@@ -116,21 +117,83 @@ createApp({
             return this.countdown
         }
     },
+    watch: {
+        visible: {
+            immediate: true,
+            handler(value) {
+                this.applyVisibilityClass(value)
+            }
+        }
+    },
     methods: {
-        backgroundImage(image) {
-            if (!image) {
-                return { backgroundImage: 'linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.65))' }
+        applyVisibilityClass(state) {
+            const className = 'ghost-market-visible'
+            const targets = [document.body, document.documentElement]
+            targets.forEach((element) => {
+                if (!element) {
+                    return
+                }
+                if (state) {
+                    element.classList.add(className)
+                } else {
+                    element.classList.remove(className)
+                }
+            })
+        },
+        buildPropAsset(name) {
+            if (!name) {
+                return ''
             }
-
-            if (image.indexOf && (image.indexOf('linear-gradient') === 0 || image.indexOf('radial-gradient') === 0)) {
-                return { backgroundImage: image }
+            const settings = this.images || {}
+            const base = typeof settings.base === 'string' ? settings.base.trim() : ''
+            const extension = typeof settings.extension === 'string' ? settings.extension : ''
+            if (!base) {
+                return ''
             }
-
-            if (image.indexOf && image.indexOf('url(') === 0) {
-                return { backgroundImage: image }
+            const sanitizedBase = base.endsWith('/') ? base.slice(0, -1) : base
+            const normalized = String(name)
+                .toLowerCase()
+                .replace(/[^a-z0-9_/-]/g, '')
+            return `${sanitizedBase}/${normalized}${extension}`
+        },
+        resolveArtwork(item) {
+            if (!item) {
+                return ''
             }
-
-            return { backgroundImage: `linear-gradient(135deg, #00000066, #000000aa), url(${image})` }
+            if (item.image && typeof item.image === 'string' && item.image.trim() !== '') {
+                return item.image
+            }
+            if (item.artwork && typeof item.artwork === 'string' && item.artwork.trim() !== '') {
+                return item.artwork
+            }
+            const propSource = item.prop || item.weapon || item.model
+            if (propSource) {
+                const asset = this.buildPropAsset(propSource)
+                if (asset) {
+                    return asset
+                }
+            }
+            if (this.images && typeof this.images.fallback === 'string' && this.images.fallback.trim() !== '') {
+                return this.images.fallback
+            }
+            return ''
+        },
+        artworkStyles(item) {
+            const asset = this.resolveArtwork(item)
+            if (!asset) {
+                return {
+                    backgroundImage: 'linear-gradient(160deg, rgba(16, 18, 46, 0.96), rgba(9, 12, 34, 0.9))'
+                }
+            }
+            if (asset.startsWith && (asset.startsWith('linear-gradient') || asset.startsWith('radial-gradient'))) {
+                return { backgroundImage: asset }
+            }
+            if (asset.startsWith && asset.startsWith('url(')) {
+                return { backgroundImage: asset }
+            }
+            return {
+                backgroundImage: `linear-gradient(180deg, rgba(5, 7, 22, 0.18), rgba(5, 7, 22, 0.78)), url(${asset})`
+            }
         },
         formatBalance(value) {
             const number = Number(value) || 0
@@ -238,6 +301,7 @@ createApp({
                     this.hero = config.hero || {}
                     this.layout = config.layout || { featured: [], categories: [] }
                     this.currency = config.currency || this.currency
+                    this.images = Object.assign({}, this.images, config.images || {})
                     this.items = config.items || {}
                     this.phrases = config.phrases || {}
                     const activityConfig = config.activity || {}
@@ -272,6 +336,10 @@ createApp({
             if (e.key === 'Escape' && this.visible) {
                 this.close()
             }
+        })
+
+        window.addEventListener('beforeunload', () => {
+            this.applyVisibilityClass(false)
         })
 
         fetch(`https://${GetParentResourceName()}/ghostmarket:ready`, {

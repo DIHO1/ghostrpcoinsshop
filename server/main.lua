@@ -148,7 +148,10 @@ local function sanitizeItems()
             type = data.type,
             reward = data.reward,
             image = data.image,
-            ribbon = data.ribbon
+            ribbon = data.ribbon,
+            prop = data.prop,
+            model = data.model,
+            weapon = data.weapon
         }
     end
 
@@ -159,6 +162,7 @@ local function sanitizeItems()
         layout = Config.Layout,
         items = layoutItems,
         phrases = Config.LocalePhrases,
+        images = Config.Images,
         activity = {
             enabled = Config.ActivityFeed.enabled
         }

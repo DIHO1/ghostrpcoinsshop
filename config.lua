@@ -24,6 +24,12 @@ Config.Currency = {
     gradient = {'#6c5ce7', '#00d2d3'}
 }
 
+Config.Images = {
+    base = 'nui://esx_inventory/html/img',
+    extension = '.png',
+    fallback = ''
+}
+
 Config.Database = {
     walletTable = 'ghost_shop_wallet',
     eventTable = 'ghost_shop_state',
@@ -64,7 +70,7 @@ Config.Layout = {
             description = '5x Apteczka + 10 000$ gotówki + strój premium',
             price = 249,
             ribbon = 'Polecane',
-            image = 'linear-gradient(135deg, #fc5c7d, #6a82fb)'
+            prop = 'prop_cs_package_01'
         },
         {
             id = 'vip-pass',
@@ -73,7 +79,7 @@ Config.Layout = {
             description = 'Dostęp do ekskluzywnych pojazdów i boost XP',
             price = 549,
             ribbon = 'Limitowane',
-            image = 'linear-gradient(135deg, #00d2ff, #3a7bd5)'
+            prop = 'prop_ld_keypad_01'
         }
     },
     categories = {
@@ -110,6 +116,7 @@ Config.ShopItems = {
         description = '5x Apteczka + 10 000$ gotówki + strój premium.',
         price = 249,
         type = 'bundle',
+        prop = 'prop_cs_package_01',
         reward = {
             type = 'bundle',
             data = {
@@ -124,6 +131,7 @@ Config.ShopItems = {
         description = 'Nadaje rangę VIP na 7 dni wraz z bonusami.',
         price = 549,
         type = 'service',
+        prop = 'prop_ld_keypad_01',
         reward = {
             type = 'group',
             data = { group = 'vip', duration = 7 * 24 * 60 }
@@ -134,6 +142,7 @@ Config.ShopItems = {
         description = 'x2 doświadczenie dla wszystkich aktywności przez godzinę.',
         price = 199,
         type = 'service',
+        prop = 'prop_ld_paper_01',
         reward = {
             type = 'event',
             data = {event = 'ghostmarket:activateDoubleXP', duration = 60}
@@ -144,6 +153,7 @@ Config.ShopItems = {
         description = 'Zwiększa zyski ze sprzedaży o 25% na 45 min.',
         price = 149,
         type = 'service',
+        prop = 'prop_mp_drug_package',
         reward = {
             type = 'event',
             data = {event = 'ghostmarket:activateDrugBoost', duration = 45}
@@ -154,6 +164,7 @@ Config.ShopItems = {
         description = 'Umieszcza Cię na szczycie kolejki oczekujących na serwer.',
         price = 399,
         type = 'service',
+        prop = 'prop_tapeplayer_01',
         reward = {
             type = 'group',
             data = {group = 'priority', duration = 7 * 24 * 60}
@@ -164,6 +175,7 @@ Config.ShopItems = {
         description = 'Sportowe coupe dostępne od ręki.',
         price = 1199,
         type = 'vehicle',
+        prop = 'prop_car_bonnet_01',
         reward = {
             type = 'vehicle',
             data = {model = 'cypher', garage = 'premium'}
@@ -174,6 +186,7 @@ Config.ShopItems = {
         description = 'Pakiet driftowy + tunning wizualny.',
         price = 1499,
         type = 'vehicle',
+        prop = 'prop_carseat_01',
         reward = {
             type = 'vehicle',
             data = {model = 'jester4', garage = 'premium'}
@@ -184,6 +197,7 @@ Config.ShopItems = {
         description = 'Egzotyczny pojazd amfibii do zadań specjalnych.',
         price = 2499,
         type = 'vehicle',
+        prop = 'prop_suitcase_01a',
         reward = {
             type = 'vehicle',
             data = {model = 'stromberg', garage = 'premium'}
@@ -194,6 +208,7 @@ Config.ShopItems = {
         description = 'Zawiera gwarantowany przedmiot legendarny.',
         price = 799,
         type = 'crate',
+        prop = 'prop_cs_cardbox_01',
         reward = {
             type = 'crate',
             data = {
@@ -214,6 +229,7 @@ Config.ShopItems = {
         description = 'Stylowe samochody i boosty gangowe.',
         price = 499,
         type = 'crate',
+        prop = 'prop_cardbordbox_02a',
         reward = {
             type = 'crate',
             data = {
@@ -232,6 +248,7 @@ Config.ShopItems = {
         description = 'Jednorazowa zmiana danych postaci u administracji.',
         price = 299,
         type = 'service',
+        prop = 'prop_idol_01',
         reward = {
             type = 'ticket',
             data = {category = 'support', subject = 'Zmiana imienia'}
@@ -242,6 +259,7 @@ Config.ShopItems = {
         description = 'Odblokowuje dodatkowe miejsce dla członka gangu.',
         price = 899,
         type = 'service',
+        prop = 'prop_ld_ferris_wheel',
         reward = {
             type = 'group',
             data = {group = 'gangplus', duration = 30 * 24 * 60}
