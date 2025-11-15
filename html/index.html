@@ -38,8 +38,11 @@
                                     >
                                         {{ hero.badge.text }}
                                     </div>
-                                    <h2>{{ hero.title }}</h2>
-                                    <p>{{ hero.subtitle }}</p>
+                                    <div class="hero-headline">
+                                        <p class="eyebrow">{{ phrases.heroEyebrow }}</p>
+                                        <h2>{{ hero.title }}</h2>
+                                        <p>{{ hero.subtitle }}</p>
+                                    </div>
                                     <div class="hero-timer" v-if="event">
                                         <span>{{ phrases.heroTimer }}</span>
                                         <strong>{{ eventCountdown }}</strong>
@@ -72,7 +75,7 @@
                             </div>
                         </section>
 
-                        <section class="catalog" v-if="layout.categories">
+                        <section class="catalog" v-if="layout.categories && layout.categories.length">
                             <header class="section-header">
                                 <h3>Kategorie</h3>
                                 <div class="tabs">
@@ -82,7 +85,7 @@
                                         :class="['tab', { active: selectedCategory === category.id }]"
                                         @click="selectCategory(category.id)"
                                     >
-                                        <span class="material">{{ category.icon }}</span>
+                                        <span class="tab-icon">{{ resolveIcon(category.icon) }}</span>
                                         <span>{{ category.label }}</span>
                                     </button>
                                 </div>
@@ -92,15 +95,20 @@
                                 <article
                                     v-for="item in categoryItems"
                                     :key="item.id"
-                                    class="catalog-card"
-                                    :style="artworkStyles(item)"
+                                    :class="['catalog-card', { 'has-art': artworkUrl(item) }]"
+                                    :style="cardAccent(item)"
                                 >
                                     <div class="catalog-body">
-                                        <h4>{{ item.label }}</h4>
-                                        <p>{{ item.description }}</p>
+                                        <div class="copy">
+                                            <h4>{{ item.label }}</h4>
+                                            <p>{{ item.description }}</p>
+                                        </div>
+                                        <div class="catalog-art" v-if="artworkUrl(item)">
+                                            <img :src="artworkUrl(item)" :alt="item.label" />
+                                        </div>
                                     </div>
                                     <div class="catalog-footer">
-                                        <span class="price">{{ currency.icon }} {{ item.price }}</span>
+                                        <span class="price">{{ currency.icon }} {{ formatPrice(item.price) }}</span>
                                         <button @click="selectItem(item.id)">{{ phrases.buyButton }}</button>
                                     </div>
                                 </article>
@@ -113,11 +121,16 @@
                             <h3>{{ phrases.history }}</h3>
                         </header>
                         <ul>
-                            <li v-if="!activity.length">Brak danych</li>
+                            <li v-if="!activity.length" class="empty">{{ phrases.historyEmpty }}</li>
                             <li v-for="entry in activity" :key="entry.id">
-                                <span class="who">{{ anonymize(entry.identifier) }}</span>
-                                <span class="what">{{ resolveItemLabel(entry.item_id) }}</span>
-                                <span class="when">{{ formatDate(entry.created_at) }}</span>
+                                <div class="row">
+                                    <span class="who">{{ anonymize(entry.identifier) }}</span>
+                                    <span class="when">{{ formatDate(entry.created_at) }}</span>
+                                </div>
+                                <div class="row">
+                                    <span class="what">{{ resolveItemLabel(entry.item_id) }}</span>
+                                    <span class="amount">-{{ currency.icon }} {{ entry.price ? formatPrice(entry.price) : '?' }}</span>
+                                </div>
                             </li>
                         </ul>
                     </aside>

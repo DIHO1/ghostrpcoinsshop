@@ -9,7 +9,15 @@ createApp({
             layout: { featured: [], categories: [] },
             currency: { icon: '👻', short: 'GC' },
             images: { base: '', extension: '', fallback: '' },
-            phrases: {},
+            phrases: {
+                tabletTitle: 'Ghost Market',
+                balanceLabel: 'Saldo',
+                buyButton: 'Zgarnij',
+                heroTimer: 'Do końca wydarzenia',
+                heroEyebrow: 'Kosmiczne oferty',
+                history: 'Ostatnia aktywność',
+                historyEmpty: 'Brak danych'
+            },
             items: {},
             activity: [],
             activityEnabled: false,
@@ -168,7 +176,11 @@ createApp({
             }
             const propSource = item.prop || item.weapon || item.model
             if (propSource) {
-                const asset = this.buildPropAsset(propSource)
+                const normalized = String(propSource).toLowerCase()
+                if (normalized.startsWith('weapon_')) {
+                    return `nui://game/ui/weapon/${normalized}.png`
+                }
+                const asset = this.buildPropAsset(normalized)
                 if (asset) {
                     return asset
                 }
@@ -178,26 +190,39 @@ createApp({
             }
             return ''
         },
-        artworkStyles(item) {
+        artworkUrl(item) {
             const asset = this.resolveArtwork(item)
-            if (!asset) {
-                return {
-                    backgroundImage: 'linear-gradient(160deg, rgba(16, 18, 46, 0.96), rgba(9, 12, 34, 0.9))'
+            if (!asset || typeof asset !== 'string') {
+                return ''
+            }
+            if (asset.startsWith('linear-gradient') || asset.startsWith('radial-gradient')) {
+                return ''
+            }
+            if (asset.startsWith('url(')) {
+                const match = asset.match(/^url\((['\"]?)(.*)\1\)$/)
+                if (match && match[2]) {
+                    return match[2]
                 }
+                return ''
             }
-            if (asset.startsWith && (asset.startsWith('linear-gradient') || asset.startsWith('radial-gradient'))) {
-                return { backgroundImage: asset }
-            }
-            if (asset.startsWith && asset.startsWith('url(')) {
-                return { backgroundImage: asset }
-            }
+            return asset
+        },
+        cardAccent(item) {
+            const baseGradient = Array.isArray(this.currency.gradient) ? this.currency.gradient : []
+            const cardGradient = Array.isArray(item && item.gradient) ? item.gradient : []
+            const [a, b] = [cardGradient[0] || baseGradient[0], cardGradient[1] || baseGradient[1]]
             return {
-                backgroundImage: `linear-gradient(180deg, rgba(5, 7, 22, 0.18), rgba(5, 7, 22, 0.78)), url(${asset})`
+                '--card-accent-a': a || 'rgba(113, 82, 255, 0.45)',
+                '--card-accent-b': b || 'rgba(59, 200, 255, 0.35)'
             }
         },
         formatBalance(value) {
             const number = Number(value) || 0
             return `${number.toLocaleString('pl-PL')} ${this.currency.short}`
+        },
+        formatPrice(value) {
+            const number = Number(value) || 0
+            return number.toLocaleString('pl-PL')
         },
         selectCategory(categoryId) {
             this.selectedCategory = categoryId
@@ -213,13 +238,19 @@ createApp({
             if (!itemData) return
             this.selected = Object.assign({ id: itemId }, itemData)
         },
-        purchase(itemId) {
-            if (!itemId) return
-            fetch(`https://${GetParentResourceName()}/ghostmarket:purchase`, {
+        postNui(endpoint, payload) {
+            if (typeof GetParentResourceName !== 'function') {
+                return Promise.resolve()
+            }
+            return fetch(`https://${GetParentResourceName()}/${endpoint}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ itemId })
+                body: JSON.stringify(payload || {})
             })
+        },
+        purchase(itemId) {
+            if (!itemId) return
+            this.postNui('ghostmarket:purchase', { itemId })
             this.selected = null
         },
         anonymize(identifier) {
@@ -235,6 +266,26 @@ createApp({
             const item = this.items[itemId]
             return item && item.label ? item.label : itemId
         },
+        resolveIcon(key) {
+            if (!key) {
+                return '•'
+            }
+            const normalized = String(key).toLowerCase()
+            const iconMap = {
+                bolt: '⚡',
+                fire: '🔥',
+                car: '🚗',
+                box: '📦',
+                crate: '📦',
+                service: '🛠️',
+                crown: '👑',
+                vip: '💎'
+            }
+            if (iconMap[normalized]) {
+                return iconMap[normalized]
+            }
+            return normalized.charAt(0).toUpperCase()
+        },
         formatDate(value) {
             if (!value) return ''
             const date = new Date(value)
@@ -248,11 +299,7 @@ createApp({
             this.stopTimer()
             this.selected = null
             this.crate = null
-            fetch(`https://${GetParentResourceName()}/ghostmarket:close`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: '{}'
-            })
+            this.postNui('ghostmarket:close', {})
         },
         startTimer() {
             this.stopTimer()
@@ -303,7 +350,7 @@ createApp({
                     this.currency = config.currency || this.currency
                     this.images = Object.assign({}, this.images, config.images || {})
                     this.items = config.items || {}
-                    this.phrases = config.phrases || {}
+                    this.phrases = Object.assign({}, this.phrases, config.phrases || {})
                     const activityConfig = config.activity || {}
                     this.activityEnabled = !!activityConfig.enabled
                     this.activity = Array.isArray(data.activity) ? data.activity : []
@@ -342,10 +389,6 @@ createApp({
             this.applyVisibilityClass(false)
         })
 
-        fetch(`https://${GetParentResourceName()}/ghostmarket:ready`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: '{}'
-        })
+        this.postNui('ghostmarket:ready', {})
     }
 }).mount('#app')
