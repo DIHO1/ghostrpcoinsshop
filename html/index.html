@@ -28,15 +28,27 @@
                 <div class="market-body">
                     <main class="main-column">
                         <section class="hero" :style="heroStyle">
-                            <div class="badge" v-if="hero.badge">
-                                {{ hero.badge.text }}
-                            </div>
-                            <div class="hero-text">
-                                <h2>{{ hero.title }}</h2>
-                                <p>{{ hero.subtitle }}</p>
-                                <div class="hero-timer" v-if="event">
-                                    <span>{{ phrases.heroTimer }}</span>
-                                    <strong>{{ eventCountdown }}</strong>
+                            <div class="hero-overlay"></div>
+                            <div class="hero-inner">
+                                <div class="hero-copy">
+                                    <div
+                                        class="badge"
+                                        v-if="hero.badge"
+                                        :style="{ background: hero.badge.color || '#ff7675' }"
+                                    >
+                                        {{ hero.badge.text }}
+                                    </div>
+                                    <h2>{{ hero.title }}</h2>
+                                    <p>{{ hero.subtitle }}</p>
+                                    <div class="hero-timer" v-if="event">
+                                        <span>{{ phrases.heroTimer }}</span>
+                                        <strong>{{ eventCountdown }}</strong>
+                                    </div>
+                                </div>
+                                <div class="hero-visual" aria-hidden="true">
+                                    <div class="hero-orb orb-a"></div>
+                                    <div class="hero-orb orb-b"></div>
+                                    <div class="hero-grid"></div>
                                 </div>
                             </div>
                         </section>

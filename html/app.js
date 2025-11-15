@@ -23,23 +23,82 @@ createApp({
     computed: {
         heroStyle() {
             const bg = typeof this.hero.background === 'string' ? this.hero.background : ''
-            const gradientA = this.currency && this.currency.gradient && this.currency.gradient[0] ? this.currency.gradient[0] : '#111'
-            const gradientB = this.currency && this.currency.gradient && this.currency.gradient[1] ? this.currency.gradient[1] : '#222'
-            const overlayB = gradientB.length === 7 ? `${gradientB}90` : gradientB
+            const gradientA = this.currency && this.currency.gradient && typeof this.currency.gradient[0] === 'string'
+                ? this.currency.gradient[0]
+                : '#755efc'
+            const gradientB = this.currency && this.currency.gradient && typeof this.currency.gradient[1] === 'string'
+                ? this.currency.gradient[1]
+                : '#37e2ff'
+
+            const gradientColorA = gradientA && gradientA.includes && (gradientA.includes('gradient') || gradientA.includes('url('))
+                ? '#755efc'
+                : gradientA
+            const gradientColorB = gradientB && gradientB.includes && (gradientB.includes('gradient') || gradientB.includes('url('))
+                ? '#37e2ff'
+                : gradientB
+
+            const ensureRgba = (value, alpha) => {
+                if (!value || typeof value !== 'string') {
+                    return value
+                }
+                if (value.startsWith('#')) {
+                    let hex = value.slice(1)
+                    if (hex.length === 3) {
+                        hex = hex.split('').map((c) => c + c).join('')
+                    }
+                    const r = parseInt(hex.slice(0, 2), 16)
+                    const g = parseInt(hex.slice(2, 4), 16)
+                    const b = parseInt(hex.slice(4, 6), 16)
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`
+                }
+                if (value.startsWith('rgb')) {
+                    const parts = value
+                        .replace(/rgba?\(/, '')
+                        .replace(/\)/, '')
+                        .split(',')
+                        .map((p) => p.trim())
+                    if (parts.length >= 3) {
+                        const [r, g, b] = parts
+                        return `rgba(${r}, ${g}, ${b}, ${alpha})`
+                    }
+                    return value
+                }
+                return value
+            }
+
+            const accentSourceA = gradientA && gradientA.includes && (gradientA.includes('gradient') || gradientA.includes('url('))
+                ? '#755efc'
+                : gradientA
+            const accentSourceB = gradientB && gradientB.includes && (gradientB.includes('gradient') || gradientB.includes('url('))
+                ? '#37e2ff'
+                : gradientB
+
+            const accentA = ensureRgba(accentSourceA, 0.85) || 'rgba(117, 94, 252, 0.85)'
+            const accentB = ensureRgba(accentSourceB, 0.95) || 'rgba(55, 226, 255, 0.95)'
+            const overlayB = ensureRgba(accentSourceB, 0.65)
+
+            const style = {
+                '--hero-accent-a': accentA,
+                '--hero-accent-b': accentB
+            }
 
             if (!bg) {
-                return { backgroundImage: `linear-gradient(135deg, ${gradientA}, ${gradientB})` }
+                style.backgroundImage = `linear-gradient(135deg, ${gradientColorA}, ${gradientColorB})`
+                return style
             }
 
             if (bg.indexOf('linear-gradient') === 0 || bg.indexOf('radial-gradient') === 0) {
-                return { backgroundImage: bg }
+                style.backgroundImage = bg
+                return style
             }
 
             if (bg.indexOf('url(') === 0) {
-                return { backgroundImage: bg }
+                style.backgroundImage = bg
+                return style
             }
 
-            return { backgroundImage: `linear-gradient(135deg, ${gradientA}, ${overlayB}), url(${bg})` }
+            style.backgroundImage = `linear-gradient(135deg, ${gradientColorA}, ${overlayB}), url(${bg})`
+            return style
         },
         categoryItems() {
             const categories = (this.layout && Array.isArray(this.layout.categories)) ? this.layout.categories : []
