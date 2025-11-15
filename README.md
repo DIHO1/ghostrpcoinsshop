@@ -28,7 +28,7 @@ add_principal identifier.steam:110000112345678 group.admin   # przypisz konkretn
 Jeżeli zmienisz nazwę flagi w `Config.Admin.requiredAce` lub `Config.EventTimer.requiredAce`, zaktualizuj wpisy ACE odpowiednio. Po starcie zasobu w konsoli pojawią się instrukcje z aktualną nazwą wymaganej flagi.
 
 ## Dostępne komendy
-- `/market` – otwiera tablet Ghost Market (domyślnie również pod klawiszem **F7**).
+- `/sklep` – otwiera tablet Ghost Market (domyślnie również pod klawiszem **F7** / komenda `ghostmarket:tablet`).
 - `/ghostcoins <add|remove|set|show>` – zarządzanie saldem graczy. Wspiera identyfikatory ESX (steam, license) oraz ID gracza na serwerze.
 - `/marketevent <set|show|clear>` – zarządzanie licznikiem wydarzenia widocznym na ekranie startowym tabletu. Komenda przyjmuje formaty czasu typu `2h30m`, `90` (minuty) lub `01:30:00`.
 
@@ -39,11 +39,13 @@ W pliku [`config.lua`](config.lua) znajdziesz:
 - układ tabletu (`Config.Layout`) – hero sekcja, sekcje katalogu, wyróżnione elementy,
 - pełną listę produktów (`Config.ShopItems`) w tym skrzynki z wagami dropów, pojazdy, usługi i boosty.
 
+Sekcja `Config.Images` pozwala wskazać katalog z własnymi miniaturami (`base` + `extension`) oraz czy korzystać z natywnych ikon GTA (`weaponBase`, `propBase`). Jeżeli produkt ma pole `weapon_...` albo `prop_...`, interfejs automatycznie wyświetli odpowiedni render modelu, a w pozostałych przypadkach użyje grafiki z katalogu lub wbudowanego fallbacku `images/fallback.svg`.
+
 Dostosuj strukturę według potrzeb – każdy produkt posiada `rewardData` przekazywane do serwera (`item`, `money`, `group`, `vehicle` oraz `crate`).
 
 ## Interfejs NUI
 - Pełnoekranowe tło wykorzystuje grafikę Franklina z lekkim rozmyciem i neonową warstwą.
-- Tablet wyświetla saldo, hero sekcję z licznikiem, katalog z filtrowaniem, log aktywności i animacje otwierania skrzynek.
+- Tablet wyświetla saldo, hero sekcję z licznikiem, katalog z filtrowaniem, log aktywności i animacje otwierania skrzynek. Dla produktów automatycznie renderowane są ikonki broni/propów (np. `weapon_pistol`, `prop_cs_package_01`) bez konieczności podmieniania HTML.
 - Zakupy wymagają potwierdzenia w modalnym oknie, a interfejs można zamknąć przyciskiem, komendą lub klawiszem **ESC**.
 
 ## Integracje nagród
